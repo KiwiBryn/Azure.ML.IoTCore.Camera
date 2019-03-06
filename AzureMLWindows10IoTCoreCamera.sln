@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalInputTrigger", "Digi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoDigitalInputTrigger", "PhotoDigitalInputTrigger\PhotoDigitalInputTrigger.csproj", "{9FBFCB6A-7E43-48E8-A59A-2F2AE1056F2E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomVisionServiceDigitalInputTrigger", "CustomVisionServiceDigitalInputTrigger\CustomVisionServiceDigitalInputTrigger.csproj", "{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -73,6 +75,24 @@ Global
 		{9FBFCB6A-7E43-48E8-A59A-2F2AE1056F2E}.Release|x86.ActiveCfg = Release|x86
 		{9FBFCB6A-7E43-48E8-A59A-2F2AE1056F2E}.Release|x86.Build.0 = Release|x86
 		{9FBFCB6A-7E43-48E8-A59A-2F2AE1056F2E}.Release|x86.Deploy.0 = Release|x86
+		{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}.Debug|ARM.ActiveCfg = Debug|ARM
+		{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}.Debug|ARM.Build.0 = Debug|ARM
+		{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}.Debug|ARM.Deploy.0 = Debug|ARM
+		{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}.Debug|x64.ActiveCfg = Debug|x64
+		{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}.Debug|x64.Build.0 = Debug|x64
+		{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}.Debug|x64.Deploy.0 = Debug|x64
+		{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}.Debug|x86.ActiveCfg = Debug|x86
+		{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}.Debug|x86.Build.0 = Debug|x86
+		{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}.Debug|x86.Deploy.0 = Debug|x86
+		{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}.Release|ARM.ActiveCfg = Release|ARM
+		{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}.Release|ARM.Build.0 = Release|ARM
+		{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}.Release|ARM.Deploy.0 = Release|ARM
+		{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}.Release|x64.ActiveCfg = Release|x64
+		{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}.Release|x64.Build.0 = Release|x64
+		{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}.Release|x64.Deploy.0 = Release|x64
+		{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}.Release|x86.ActiveCfg = Release|x86
+		{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}.Release|x86.Build.0 = Release|x86
+		{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
