@@ -77,7 +77,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTrigger
 			backgroundTaskDeferral = taskInstance.GetDeferral();
 		}
 
-		private void InterruptGpioPin_ValueChanged(GpioPin sender, GpioPinValueChangedEventArgs args)
+		private async void InterruptGpioPin_ValueChanged(GpioPin sender, GpioPinValueChangedEventArgs args)
 		{
 			DateTime currentTime = DateTime.UtcNow;
 			Debug.WriteLine($"{DateTime.UtcNow.ToLongTimeString()} Digital Input Interrupt {sender.PinNumber} triggered {args.Edge}");
@@ -98,15 +98,15 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTrigger
 			{
 				using (Windows.Storage.Streams.InMemoryRandomAccessStream captureStream = new Windows.Storage.Streams.InMemoryRandomAccessStream())
 				{
-					mediaCapture.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), captureStream).AsTask().Wait();
-					captureStream.FlushAsync().AsTask().Wait();
+					await mediaCapture.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), captureStream);
+					await captureStream.FlushAsync();
 					captureStream.Seek(0);
 
 					string filename = string.Format(ImageFilenameFormat, currentTime);
 
-					IStorageFile photoFile = KnownFolders.PicturesLibrary.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting).AsTask().Result;
+					IStorageFile photoFile = await KnownFolders.PicturesLibrary.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
 					ImageEncodingProperties imageProperties = ImageEncodingProperties.CreateJpeg();
-					mediaCapture.CapturePhotoToStorageFileAsync(imageProperties, photoFile).AsTask().Wait();
+					await mediaCapture.CapturePhotoToStorageFileAsync(imageProperties, photoFile);
 
 					LoggingFields imageInformation = new LoggingFields();
 
