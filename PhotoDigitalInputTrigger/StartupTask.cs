@@ -45,7 +45,9 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTrigger
 
 		public void Run(IBackgroundTaskInstance taskInstance)
 		{
-			Debug.WriteLine("Application startup");
+			LoggingFields startupInformation = new LoggingFields();
+
+			this.logging.LogEvent("Application starting");
 
 			try
 			{
@@ -66,6 +68,11 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTrigger
 				return;
 			}
 
+			startupInformation.AddString("PrimaryUse", mediaCapture.VideoDeviceController.PrimaryUse.ToString());
+			startupInformation.AddInt32("Interrupt pin", InterruptPinNumber);
+
+			this.logging.LogEvent("Application started", startupInformation);
+
 			//enable task to continue running in background
 			backgroundTaskDeferral = taskInstance.GetDeferral();
 		}
@@ -73,7 +80,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTrigger
 		private void InterruptGpioPin_ValueChanged(GpioPin sender, GpioPinValueChangedEventArgs args)
 		{
 			DateTime currentTime = DateTime.UtcNow;
-			Debug.WriteLine($"Digital Input Interrupt {sender.PinNumber} triggered {args.Edge}");
+			Debug.WriteLine($"{DateTime.UtcNow.ToLongTimeString()} Digital Input Interrupt {sender.PinNumber} triggered {args.Edge}");
 
 			if (args.Edge == GpioPinEdge.RisingEdge)
 			{
@@ -110,6 +117,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTrigger
 					imageInformation.AddUInt32("Height", imageProperties.Height);
 					imageInformation.AddUInt32("Width", imageProperties.Width);
 					imageInformation.AddUInt64("Size", captureStream.Size);
+
 					this.logging.LogEvent("Captured image saved to storage", imageInformation);
 				}
 			}

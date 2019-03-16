@@ -61,7 +61,7 @@ namespace devMobile.Windows10IotCore.IoT.DigitalInputTrigger
 
 		private void InterruptGpioPin_ValueChanged(GpioPin sender, GpioPinValueChangedEventArgs args)
 		{
-			Debug.WriteLine($"Digital Input Interrupt {sender.PinNumber} triggered {args.Edge}");
+			Debug.WriteLine($"{DateTime.UtcNow.ToLongTimeString()} Digital Input Interrupt {sender.PinNumber} triggered {args.Edge}");
 		}
 	}
 }
