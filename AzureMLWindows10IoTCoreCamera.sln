@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoDigitalInputTrigger", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomVisionServiceDigitalInputTrigger", "CustomVisionServiceDigitalInputTrigger\CustomVisionServiceDigitalInputTrigger.csproj", "{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoDigitalInputTriggerAzureStorage", "PhotoDigitalInputTriggerAzureStorage\PhotoDigitalInputTriggerAzureStorage.csproj", "{7803B1BC-DAAE-4187-98A1-E87DDBECA129}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -93,6 +95,24 @@ Global
 		{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}.Release|x86.ActiveCfg = Release|x86
 		{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}.Release|x86.Build.0 = Release|x86
 		{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}.Release|x86.Deploy.0 = Release|x86
+		{7803B1BC-DAAE-4187-98A1-E87DDBECA129}.Debug|ARM.ActiveCfg = Debug|ARM
+		{7803B1BC-DAAE-4187-98A1-E87DDBECA129}.Debug|ARM.Build.0 = Debug|ARM
+		{7803B1BC-DAAE-4187-98A1-E87DDBECA129}.Debug|ARM.Deploy.0 = Debug|ARM
+		{7803B1BC-DAAE-4187-98A1-E87DDBECA129}.Debug|x64.ActiveCfg = Debug|x64
+		{7803B1BC-DAAE-4187-98A1-E87DDBECA129}.Debug|x64.Build.0 = Debug|x64
+		{7803B1BC-DAAE-4187-98A1-E87DDBECA129}.Debug|x64.Deploy.0 = Debug|x64
+		{7803B1BC-DAAE-4187-98A1-E87DDBECA129}.Debug|x86.ActiveCfg = Debug|x86
+		{7803B1BC-DAAE-4187-98A1-E87DDBECA129}.Debug|x86.Build.0 = Debug|x86
+		{7803B1BC-DAAE-4187-98A1-E87DDBECA129}.Debug|x86.Deploy.0 = Debug|x86
+		{7803B1BC-DAAE-4187-98A1-E87DDBECA129}.Release|ARM.ActiveCfg = Release|ARM
+		{7803B1BC-DAAE-4187-98A1-E87DDBECA129}.Release|ARM.Build.0 = Release|ARM
+		{7803B1BC-DAAE-4187-98A1-E87DDBECA129}.Release|ARM.Deploy.0 = Release|ARM
+		{7803B1BC-DAAE-4187-98A1-E87DDBECA129}.Release|x64.ActiveCfg = Release|x64
+		{7803B1BC-DAAE-4187-98A1-E87DDBECA129}.Release|x64.Build.0 = Release|x64
+		{7803B1BC-DAAE-4187-98A1-E87DDBECA129}.Release|x64.Deploy.0 = Release|x64
+		{7803B1BC-DAAE-4187-98A1-E87DDBECA129}.Release|x86.ActiveCfg = Release|x86
+		{7803B1BC-DAAE-4187-98A1-E87DDBECA129}.Release|x86.Build.0 = Release|x86
+		{7803B1BC-DAAE-4187-98A1-E87DDBECA129}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
