@@ -44,18 +44,29 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimer
 
 		public void Run(IBackgroundTaskInstance taskInstance)
 		{
+			LoggingFields startupInformation = new LoggingFields();
+
+			this.logging.LogEvent("Application starting");
+
 			try
 			{
 				mediaCapture = new MediaCapture();
 				mediaCapture.InitializeAsync().AsTask().Wait();
 
 				ImageUpdatetimer = new Timer(ImageUpdateTimerCallback, null, ImageUpdateDueDefault, ImageUpdatePeriodDefault);
+
 			}
 			catch (Exception ex)
 			{
 				this.logging.LogMessage("Camera configuration failed " + ex.Message, LoggingLevel.Error);
 				return;
 			}
+
+			startupInformation.AddString("PrimaryUse", mediaCapture.VideoDeviceController.PrimaryUse.ToString());
+			startupInformation.AddTimeSpan("Due", ImageUpdateDueDefault);
+			startupInformation.AddTimeSpan("Period", ImageUpdatePeriodDefault);
+
+			this.logging.LogEvent("Application started", startupInformation);
 
 			//enable task to continue running in background
 			backgroundTaskDeferral = taskInstance.GetDeferral();
@@ -88,12 +99,12 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimer
 					imageInformation.AddUInt32("Width", imageProperties.Width);
 					imageInformation.AddUInt64("Size", captureStream.Size);
 
-					this.logging.LogEvent("Captured imagesaved to storage", imageInformation);
+					this.logging.LogEvent("Image saved to storage", imageInformation);
 				}
 			}
 			catch (Exception ex)
 			{
-				this.logging.LogMessage("Camera photo or save failed " + ex.Message, LoggingLevel.Error);
+				this.logging.LogMessage("Image capture or save to local storage failed " + ex.Message, LoggingLevel.Error);
 			}
 		}
 	}
