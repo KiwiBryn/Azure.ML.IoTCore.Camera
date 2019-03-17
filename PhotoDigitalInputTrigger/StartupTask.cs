@@ -98,10 +98,6 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTrigger
 			{
 				using (Windows.Storage.Streams.InMemoryRandomAccessStream captureStream = new Windows.Storage.Streams.InMemoryRandomAccessStream())
 				{
-					await mediaCapture.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), captureStream);
-					await captureStream.FlushAsync();
-					captureStream.Seek(0);
-
 					string filename = string.Format(ImageFilenameFormat, currentTime);
 
 					IStorageFile photoFile = await KnownFolders.PicturesLibrary.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
