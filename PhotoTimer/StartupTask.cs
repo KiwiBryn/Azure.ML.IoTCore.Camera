@@ -80,10 +80,6 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimer
 			{
 				using (Windows.Storage.Streams.InMemoryRandomAccessStream captureStream = new Windows.Storage.Streams.InMemoryRandomAccessStream())
 				{
-					mediaCapture.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), captureStream).AsTask().Wait();
-					captureStream.FlushAsync().AsTask().Wait();
-					captureStream.Seek(0);
-
 					string filename = string.Format(ImageFilenameFormat, currentTime);
 
 					IStorageFile photoFile = KnownFolders.PicturesLibrary.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting).AsTask().Result;
