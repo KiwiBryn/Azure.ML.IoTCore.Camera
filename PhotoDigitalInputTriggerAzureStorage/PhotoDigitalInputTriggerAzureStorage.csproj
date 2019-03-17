@@ -7,7 +7,7 @@
     <ProjectGuid>{7803B1BC-DAAE-4187-98A1-E87DDBECA129}</ProjectGuid>
     <OutputType>winmdobj</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PhotoDigitalInputTriggerAzureStorage</RootNamespace>
+    <RootNamespace>devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage</RootNamespace>
     <AssemblyName>PhotoDigitalInputTriggerAzureStorage</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
@@ -131,6 +131,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.7</Version>
+    </PackageReference>
+    <PackageReference Include="WindowsAzure.Storage">
+      <Version>9.3.3</Version>
     </PackageReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '15.0' ">

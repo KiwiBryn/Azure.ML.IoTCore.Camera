@@ -1,47 +1,27 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<Package
-  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
-  xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
-  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
-  xmlns:iot="http://schemas.microsoft.com/appx/manifest/iot/windows10"
-  IgnorableNamespaces="uap mp iot">
-
-  <Identity
-    Name="PhotoDigitalInputTriggerAzureStorage-uwp"
-    Publisher="CN=Bryn.Lewis"
-    Version="1.0.0.0" />
-
-  <mp:PhoneIdentity PhoneProductId="883c300c-11fb-45d0-a6b2-6b1efe4e1c1d" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:iot="http://schemas.microsoft.com/appx/manifest/iot/windows10" xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3" xmlns:uap6="http://schemas.microsoft.com/appx/manifest/uap/windows10/6" xmlns:uap4="http://schemas.microsoft.com/appx/manifest/uap/windows10/4" xmlns:uap2="http://schemas.microsoft.com/appx/manifest/uap/windows10/2" xmlns:mobile="http://schemas.microsoft.com/appx/manifest/mobile/windows10" IgnorableNamespaces="uap mp iot uap3 uap6 uap4 uap2 mobile">
+  <Identity Name="PhotoDigitalInputTriggerAzureStorage-uwp" Publisher="CN=Bryn.Lewis" Version="1.0.0.0" />
+  <mp:PhoneIdentity PhoneProductId="883c300c-11fb-45d0-a6b2-6b1efe4e1c1d" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>PhotoDigitalInputTriggerAzureStorage</DisplayName>
     <PublisherDisplayName>Bryn.Lewis</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
-
   <Dependencies>
     <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
   </Dependencies>
-
   <Resources>
-    <Resource Language="x-generate"/>
+    <Resource Language="x-generate" />
   </Resources>
-
   <Applications>
     <Application Id="App">
-      <uap:VisualElements
-        DisplayName="PhotoDigitalInputTriggerAzureStorage"
-        Square150x150Logo="Assets\Square150x150Logo.png"
-        Square44x44Logo="Assets\Square44x44Logo.png"
-        Description="PhotoDigitalInputTriggerAzureStorage"
-        BackgroundColor="transparent"
-        AppListEntry="none">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
+      <uap:VisualElements DisplayName="devMobile Photo Digital Input Trigger Azure Storage Upload demo" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="Windows 10 IoT Core application which shows how to use a digital input as a trigger for taking a photo to upload to Azure Storge" BackgroundColor="transparent" AppListEntry="none">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png">
+        </uap:DefaultTile>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
       <Extensions>
-        <Extension Category="windows.backgroundTasks" EntryPoint="PhotoDigitalInputTriggerAzureStorage.StartupTask">
+        <Extension Category="windows.backgroundTasks" EntryPoint="devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage.StartupTask">
           <BackgroundTasks>
             <iot:Task Type="startup" />
           </BackgroundTasks>
@@ -49,8 +29,11 @@
       </Extensions>
     </Application>
   </Applications>
-
   <Capabilities>
     <Capability Name="internetClient" />
+    <uap:Capability Name="picturesLibrary" />
+    <DeviceCapability Name="microphone" />
+    <DeviceCapability Name="webcam" />
+    <DeviceCapability Name="lowLevel" />
   </Capabilities>
 </Package>
