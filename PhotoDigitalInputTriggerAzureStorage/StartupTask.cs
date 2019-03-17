@@ -49,7 +49,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 		private const string ImageFilenameFormat = "image{1:yyMMddhhmmss}.jpg";
 		private const string ContainerNameFormat = "{0}{1:yyMMdd}";
 		private volatile bool CameraBusy = false;
-		private const string AzureStorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=deviceimages;AccountKey=8l7R5crjc3gvlAduJiJHhbKpvmux8e1r1r/JhyOaoI20FhliIjiNTV5QmXE1LGZCEqEHVg1nMsqQeV2cjlVEtg==;EndpointSuffix=core.windows.net";
+		private const string AzureStorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=...;AccountKey=..;EndpointSuffix=...";
 
 		public void Run(IBackgroundTaskInstance taskInstance)
 		{
