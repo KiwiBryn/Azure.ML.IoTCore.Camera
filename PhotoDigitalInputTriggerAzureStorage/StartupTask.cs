@@ -46,18 +46,20 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 		private BackgroundTaskDeferral backgroundTaskDeferral = null;
 		private readonly LoggingChannel logging = new LoggingChannel("devMobile Photo Digital Input Trigger Azure Storage demo", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
 		private const string ConfigurationFilename = "appsettings.json";
-		private GpioPin InterruptGpioPin = null;
-		private const int InterruptPinNumber = 5;
+		private GpioPin interruptGpioPin = null;
+		private int interruptPinNumber;
 		private MediaCapture mediaCapture;
-		private const string ImageFilenameLatest = "latest.jpg";
-		private const string ImageFilenameFormat = "image{1:yyMMddhhmmss}.jpg";
-		private const string ContainerNameFormat = "{0}{1:yyMMdd}";
-		private volatile bool CameraBusy = false;
-		private string AzureStorageConnectionString ;
+		private string azureStorageConnectionString;
+		private string imageFilenameLatest;
+		private string imageFilenameFormat;
+		private string containerNameFormat;
+		private volatile bool cameraBusy = false;
 
 		public void Run(IBackgroundTaskInstance taskInstance)
 		{
 			StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+
+			this.logging.LogEvent("Application starting");
 
 			// Log the Application build, shield information etc.
 			LoggingFields startupInformation = new LoggingFields();
@@ -70,8 +72,6 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 			PackageId packageId = package.Id;
 			PackageVersion version = packageId.Version;
 			startupInformation.AddString("ApplicationVersion", string.Format($"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}"));
-			startupInformation.AddInt32("Interrupt pin", InterruptPinNumber);
-			this.logging.LogEvent("Application starting", startupInformation);
 
 			try
 			{
@@ -83,7 +83,21 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 				}
 
 				IConfiguration configuration = new ConfigurationBuilder().AddJsonFile(localFolder.Path + @"\" + "appsettings.json", false, true).Build();
-				AzureStorageConnectionString = configuration.GetSection("AzureStorageConnectionString").Value;
+
+				azureStorageConnectionString = configuration.GetSection("AzureStorageConnectionString").Value;
+				startupInformation.AddString("AzureStorageConnectionString", azureStorageConnectionString);
+
+				imageFilenameLatest = configuration.GetSection("ImageFilenameLatest").Value;
+				startupInformation.AddString("ImageFilenameLatest", imageFilenameLatest);
+
+				imageFilenameFormat = configuration.GetSection("ImageFilenameFormat").Value;
+				startupInformation.AddString("ImageFilenameFormat", imageFilenameFormat);
+
+				containerNameFormat = configuration.GetSection("ContainerNameFormat").Value;
+				startupInformation.AddString("ContainerNameFormat", containerNameFormat);
+
+				interruptPinNumber = int.Parse( configuration.GetSection("InterruptPinNumber").Value);
+				startupInformation.AddInt32("Interrupt pin", interruptPinNumber);
 			}
 			catch (Exception ex)
 			{
@@ -95,19 +109,27 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 			{
 				mediaCapture = new MediaCapture();
 				mediaCapture.InitializeAsync().AsTask().Wait();
-
-				GpioController gpioController = GpioController.GetDefault();
-				InterruptGpioPin = gpioController.OpenPin(InterruptPinNumber);
-				InterruptGpioPin.SetDriveMode(GpioPinDriveMode.InputPullUp);
-				InterruptGpioPin.ValueChanged += InterruptGpioPin_ValueChanged;
 			}
 			catch (Exception ex)
 			{
-				this.logging.LogMessage("Camera or digital input configuration failed " + ex.Message, LoggingLevel.Error);
+				this.logging.LogMessage("Camera configuration failed " + ex.Message, LoggingLevel.Error);
 				return;
 			}
 
-			this.logging.LogEvent("Application started");
+			try
+			{
+				GpioController gpioController = GpioController.GetDefault();
+				interruptGpioPin = gpioController.OpenPin(interruptPinNumber);
+				interruptGpioPin.SetDriveMode(GpioPinDriveMode.InputPullUp);
+				interruptGpioPin.ValueChanged += InterruptGpioPin_ValueChanged;
+			}
+			catch (Exception ex)
+			{
+				this.logging.LogMessage("Digital input configuration failed " + ex.Message, LoggingLevel.Error);
+				return;
+			}
+
+			this.logging.LogEvent("Application started", startupInformation);
 
 			//enable task to continue running in background
 			backgroundTaskDeferral = taskInstance.GetDeferral();
@@ -124,17 +146,17 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 			}
 
 			// Just incase - stop code being called while photo already in progress
-			if (CameraBusy)
+			if (cameraBusy)
 			{
 				return;
 			}
-			CameraBusy = true;
+			cameraBusy = true;
 
 			try
 			{
 				using (InMemoryRandomAccessStream captureStream = new InMemoryRandomAccessStream())
 				{
-					string filename = string.Format(ImageFilenameFormat, Environment.MachineName.ToLower(), currentTime);
+					string filename = string.Format(imageFilenameFormat, Environment.MachineName.ToLower(), currentTime);
 
 					StorageFile photoFile = await KnownFolders.PicturesLibrary.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
 					ImageEncodingProperties imageProperties = ImageEncodingProperties.CreateJpeg();
@@ -150,17 +172,17 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 					imageInformation.AddUInt64("Size", captureStream.Size);
 					this.logging.LogEvent("Captured image saved to storage", imageInformation);
 
-					CloudStorageAccount storageAccount = CloudStorageAccount.Parse(AzureStorageConnectionString);
+					CloudStorageAccount storageAccount = CloudStorageAccount.Parse(azureStorageConnectionString);
 					CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 
-					string containername = string.Format(ContainerNameFormat, Environment.MachineName.ToLower(), currentTime);
+					string containername = string.Format(containerNameFormat, Environment.MachineName.ToLower(), currentTime);
 					CloudBlobContainer container = blobClient.GetContainerReference(containername);
 					await container.CreateIfNotExistsAsync();
 
 					CloudBlockBlob blockBlob = container.GetBlockBlobReference(filename);
 					await blockBlob.UploadFromFileAsync(photoFile);
 
-					blockBlob = container.GetBlockBlobReference(ImageFilenameLatest);
+					blockBlob = container.GetBlockBlobReference(imageFilenameLatest);
 					await blockBlob.UploadFromFileAsync(photoFile);
 				}
 			}
@@ -170,7 +192,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 			}
 			finally
 			{
-				CameraBusy = false;
+				cameraBusy = false;
 			}
 		}
 	}
