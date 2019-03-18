@@ -1,5 +1,5 @@
 ﻿/*
-    Copyright ® 2019 Feb devMobile Software, All Rights Reserved
+    Copyright ® 2019 March devMobile Software, All Rights Reserved
  
     MIT License
 
@@ -27,9 +27,11 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 	using System;
 	using System.Diagnostics;
 
+	using Microsoft.Extensions.Configuration;
 	using Microsoft.WindowsAzure.Storage;
 	using Microsoft.WindowsAzure.Storage.Blob;
 
+	using Windows.ApplicationModel;
 	using Windows.ApplicationModel.Background;
 	using Windows.Devices.Gpio;
 	using Windows.Foundation.Diagnostics;
@@ -37,11 +39,13 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 	using Windows.Media.MediaProperties;
 	using Windows.Storage;
 	using Windows.Storage.Streams;
+	using Windows.System;
 
 	public sealed class StartupTask : IBackgroundTask
 	{
-		private readonly LoggingChannel logging = new LoggingChannel("devMobile Photo Digital Input Trigger Azure Storage demo", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
 		private BackgroundTaskDeferral backgroundTaskDeferral = null;
+		private readonly LoggingChannel logging = new LoggingChannel("devMobile Photo Digital Input Trigger Azure Storage demo", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
+		private const string ConfigurationFilename = "appsettings.json";
 		private GpioPin InterruptGpioPin = null;
 		private const int InterruptPinNumber = 5;
 		private MediaCapture mediaCapture;
@@ -49,11 +53,43 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 		private const string ImageFilenameFormat = "image{1:yyMMddhhmmss}.jpg";
 		private const string ContainerNameFormat = "{0}{1:yyMMdd}";
 		private volatile bool CameraBusy = false;
-		private const string AzureStorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=...;AccountKey=..;EndpointSuffix=...";
+		private string AzureStorageConnectionString ;
 
 		public void Run(IBackgroundTaskInstance taskInstance)
 		{
-			this.logging.LogEvent("Application starting");
+			StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+
+			// Log the Application build, shield information etc.
+			LoggingFields startupInformation = new LoggingFields();
+			startupInformation.AddString("Timezone", TimeZoneSettings.CurrentTimeZoneDisplayName);
+			startupInformation.AddString("OSVersion", Environment.OSVersion.VersionString);
+			startupInformation.AddString("MachineName", Environment.MachineName);
+
+			// This is from the application manifest 
+			Package package = Package.Current;
+			PackageId packageId = package.Id;
+			PackageVersion version = packageId.Version;
+			startupInformation.AddString("ApplicationVersion", string.Format($"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}"));
+			startupInformation.AddInt32("Interrupt pin", InterruptPinNumber);
+			this.logging.LogEvent("Application starting", startupInformation);
+
+			try
+			{
+				// see if the configuration file is present if not copy minimal sample one from application directory
+				if (localFolder.TryGetItemAsync(ConfigurationFilename).AsTask().Result == null)
+				{
+					StorageFile templateConfigurationfile = Package.Current.InstalledLocation.GetFileAsync(ConfigurationFilename).AsTask().Result;
+					templateConfigurationfile.CopyAsync(localFolder, ConfigurationFilename).AsTask();
+				}
+
+				IConfiguration configuration = new ConfigurationBuilder().AddJsonFile(localFolder.Path + @"\" + "appsettings.json", false, true).Build();
+				AzureStorageConnectionString = configuration.GetSection("AzureStorageConnectionString").Value;
+			}
+			catch (Exception ex)
+			{
+				this.logging.LogMessage("JSON configuration file load or settings retrieval failed " + ex.Message, LoggingLevel.Error);
+				return;
+			}
 
 			try
 			{
@@ -71,10 +107,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 				return;
 			}
 
-			LoggingFields startupInformation = new LoggingFields();
-			startupInformation.AddString("PrimaryUse", mediaCapture.VideoDeviceController.PrimaryUse.ToString());
-			startupInformation.AddInt32("Interrupt pin", InterruptPinNumber);
-			this.logging.LogEvent("Application started", startupInformation);
+			this.logging.LogEvent("Application started");
 
 			//enable task to continue running in background
 			backgroundTaskDeferral = taskInstance.GetDeferral();
