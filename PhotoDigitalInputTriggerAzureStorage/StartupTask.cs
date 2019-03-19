@@ -38,7 +38,6 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 	using Windows.Media.Capture;
 	using Windows.Media.MediaProperties;
 	using Windows.Storage;
-	using Windows.Storage.Streams;
 	using Windows.System;
 
 	public sealed class StartupTask : IBackgroundTask
@@ -50,9 +49,10 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 		private int interruptPinNumber;
 		private MediaCapture mediaCapture;
 		private string azureStorageConnectionString;
-		private string imageFilenameLatest;
-		private string imageFilenameFormat;
-		private string containerNameFormat;
+		private string azureStorageContainerNameFormat;
+		private string azureStorageimageFilenameLatest;
+		private string azureStorageImageFilenameFormat;
+		private const string ImageFilenameLocal = "latest.jpg";
 		private volatile bool cameraBusy = false;
 
 		public void Run(IBackgroundTaskInstance taskInstance)
@@ -87,14 +87,14 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 				azureStorageConnectionString = configuration.GetSection("AzureStorageConnectionString").Value;
 				startupInformation.AddString("AzureStorageConnectionString", azureStorageConnectionString);
 
-				imageFilenameLatest = configuration.GetSection("ImageFilenameLatest").Value;
-				startupInformation.AddString("ImageFilenameLatest", imageFilenameLatest);
+				azureStorageContainerNameFormat = configuration.GetSection("AzureContainerNameFormat").Value;
+				startupInformation.AddString("ContainerNameFormat", azureStorageContainerNameFormat);
 
-				imageFilenameFormat = configuration.GetSection("ImageFilenameFormat").Value;
-				startupInformation.AddString("ImageFilenameFormat", imageFilenameFormat);
+				azureStorageImageFilenameFormat = configuration.GetSection("AzureImageFilenameFormat").Value;
+				startupInformation.AddString("ImageFilenameFormat", azureStorageImageFilenameFormat);
 
-				containerNameFormat = configuration.GetSection("ContainerNameFormat").Value;
-				startupInformation.AddString("ContainerNameFormat", containerNameFormat);
+				azureStorageimageFilenameLatest = configuration.GetSection("AzureImageFilenameLatest").Value;
+				startupInformation.AddString("ImageFilenameLatest", azureStorageimageFilenameLatest);
 
 				interruptPinNumber = int.Parse( configuration.GetSection("InterruptPinNumber").Value);
 				startupInformation.AddInt32("Interrupt pin", interruptPinNumber);
@@ -154,41 +154,38 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 
 			try
 			{
-				using (InMemoryRandomAccessStream captureStream = new InMemoryRandomAccessStream())
-				{
-					string filename = string.Format(imageFilenameFormat, Environment.MachineName.ToLower(), currentTime);
+				StorageFile photoFile = await KnownFolders.PicturesLibrary.CreateFileAsync(ImageFilenameLocal, CreationCollisionOption.ReplaceExisting);
+				ImageEncodingProperties imageProperties = ImageEncodingProperties.CreateJpeg();
+				await mediaCapture.CapturePhotoToStorageFileAsync(imageProperties, photoFile);
 
-					StorageFile photoFile = await KnownFolders.PicturesLibrary.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting);
-					ImageEncodingProperties imageProperties = ImageEncodingProperties.CreateJpeg();
-					await mediaCapture.CapturePhotoToStorageFileAsync(imageProperties, photoFile);
+				string azureContainername = string.Format(azureStorageContainerNameFormat, Environment.MachineName.ToLower(), currentTime);
+				string azureStoragefilename = string.Format(azureStorageImageFilenameFormat, Environment.MachineName.ToLower(), currentTime);
 
-					LoggingFields imageInformation = new LoggingFields();
-					imageInformation.AddDateTime("TakenAtUTC", currentTime);
-					imageInformation.AddInt32("Pin", sender.PinNumber);
-					imageInformation.AddString("Path", photoFile.Path);
-					imageInformation.AddString("Filename", filename);
-					imageInformation.AddUInt32("Height", imageProperties.Height);
-					imageInformation.AddUInt32("Width", imageProperties.Width);
-					imageInformation.AddUInt64("Size", captureStream.Size);
-					this.logging.LogEvent("Captured image saved to storage", imageInformation);
+				LoggingFields imageInformation = new LoggingFields();
+				imageInformation.AddDateTime("TakenAtUTC", currentTime);
+				imageInformation.AddString("LocalFilename", photoFile.Path);
+				imageInformation.AddString("AzureContainerName", azureContainername);
+				imageInformation.AddString("AzureStorageFilename", azureStoragefilename);
+				imageInformation.AddString("AzureStorageFilenameLatest", azureStorageimageFilenameLatest);
+				this.logging.LogEvent("Image saving to Azure storage", imageInformation);
 
-					CloudStorageAccount storageAccount = CloudStorageAccount.Parse(azureStorageConnectionString);
-					CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+				CloudStorageAccount storageAccount = CloudStorageAccount.Parse(azureStorageConnectionString);
+				CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 
-					string containername = string.Format(containerNameFormat, Environment.MachineName.ToLower(), currentTime);
-					CloudBlobContainer container = blobClient.GetContainerReference(containername);
-					await container.CreateIfNotExistsAsync();
+				CloudBlobContainer container = blobClient.GetContainerReference(azureContainername);
+				await container.CreateIfNotExistsAsync();
 
-					CloudBlockBlob blockBlob = container.GetBlockBlobReference(filename);
-					await blockBlob.UploadFromFileAsync(photoFile);
+				CloudBlockBlob blockBlob = container.GetBlockBlobReference(azureStoragefilename);
+				await blockBlob.UploadFromFileAsync(photoFile);
 
-					blockBlob = container.GetBlockBlobReference(imageFilenameLatest);
-					await blockBlob.UploadFromFileAsync(photoFile);
-				}
+				blockBlob = container.GetBlockBlobReference(azureStorageimageFilenameLatest);
+				await blockBlob.UploadFromFileAsync(photoFile);
+
+				this.logging.LogEvent("Image saved to Azure storage");
 			}
 			catch (Exception ex)
 			{
-				this.logging.LogMessage("Camera photo or save failed " + ex.Message, LoggingLevel.Error);
+				this.logging.LogMessage("Camera photo save or upload failed " + ex.Message, LoggingLevel.Error);
 			}
 			finally
 			{
