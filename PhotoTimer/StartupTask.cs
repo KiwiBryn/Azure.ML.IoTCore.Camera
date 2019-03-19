@@ -78,25 +78,21 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimer
 
 			try
 			{
-				using (Windows.Storage.Streams.InMemoryRandomAccessStream captureStream = new Windows.Storage.Streams.InMemoryRandomAccessStream())
-				{
-					string filename = string.Format(ImageFilenameFormat, currentTime);
+				string filename = string.Format(ImageFilenameFormat, currentTime);
 
-					IStorageFile photoFile = KnownFolders.PicturesLibrary.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting).AsTask().Result;
-					ImageEncodingProperties imageProperties = ImageEncodingProperties.CreateJpeg();
-					mediaCapture.CapturePhotoToStorageFileAsync(imageProperties, photoFile).AsTask().Wait();
+				IStorageFile photoFile = KnownFolders.PicturesLibrary.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting).AsTask().Result;
+				ImageEncodingProperties imageProperties = ImageEncodingProperties.CreateJpeg();
+				mediaCapture.CapturePhotoToStorageFileAsync(imageProperties, photoFile).AsTask().Wait();
 
-					LoggingFields imageInformation = new LoggingFields();
+				LoggingFields imageInformation = new LoggingFields();
 
-					imageInformation.AddDateTime("TakenAtUTC", currentTime);
-					imageInformation.AddString("Path", photoFile.Path);
-					imageInformation.AddString("Filename", filename);
-					imageInformation.AddUInt32("Height", imageProperties.Height);
-					imageInformation.AddUInt32("Width", imageProperties.Width);
-					imageInformation.AddUInt64("Size", captureStream.Size);
+				imageInformation.AddDateTime("TakenAtUTC", currentTime);
+				imageInformation.AddString("Path", photoFile.Path);
+				imageInformation.AddString("Filename", filename);
+				imageInformation.AddUInt32("Height", imageProperties.Height);
+				imageInformation.AddUInt32("Width", imageProperties.Width);
 
-					this.logging.LogEvent("Image saved to storage", imageInformation);
-				}
+				this.logging.LogEvent("Image saved to storage", imageInformation);
 			}
 			catch (Exception ex)
 			{
