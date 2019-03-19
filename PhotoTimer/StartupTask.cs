@@ -85,13 +85,9 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimer
 				mediaCapture.CapturePhotoToStorageFileAsync(imageProperties, photoFile).AsTask().Wait();
 
 				LoggingFields imageInformation = new LoggingFields();
-
 				imageInformation.AddDateTime("TakenAtUTC", currentTime);
-				imageInformation.AddString("Path", photoFile.Path);
 				imageInformation.AddString("Filename", filename);
-				imageInformation.AddUInt32("Height", imageProperties.Height);
-				imageInformation.AddUInt32("Width", imageProperties.Width);
-
+				imageInformation.AddString("Path", photoFile.Path);
 				this.logging.LogEvent("Image saved to storage", imageInformation);
 			}
 			catch (Exception ex)
