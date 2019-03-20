@@ -82,7 +82,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 					templateConfigurationfile.CopyAsync(localFolder, ConfigurationFilename).AsTask();
 				}
 
-				IConfiguration configuration = new ConfigurationBuilder().AddJsonFile(localFolder.Path + @"\" + "appsettings.json", false, true).Build();
+				IConfiguration configuration = new ConfigurationBuilder().AddJsonFile(localFolder.Path + @"\" + ConfigurationFilename, false, true).Build();
 
 				azureStorageConnectionString = configuration.GetSection("AzureStorageConnectionString").Value;
 				startupInformation.AddString("AzureStorageConnectionString", azureStorageConnectionString);
