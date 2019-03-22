@@ -35,7 +35,7 @@ namespace devMobile.Azure.Storage
 	{
 		[FunctionName("ImageEmailer")]
 		public async static Task Run(
-				[BlobTrigger("seeedrpibasehat190321/{name}")]
+				[BlobTrigger("current/{name}")]
 				Stream inputBlob,
 				string name,
 				[SendGrid(ApiKey = "")]

@@ -40,6 +40,8 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 	using Windows.Media.MediaProperties;
 	using Windows.Storage;
 	using Windows.System;
+	using System.Net.NetworkInformation;
+	using System.Linq;
 
 	public sealed class StartupTask : IBackgroundTask
 	{
@@ -49,10 +51,12 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 		private GpioPin interruptGpioPin = null;
 		private int interruptPinNumber;
 		private MediaCapture mediaCapture;
+		private string deviceMacAddress;
 		private string azureStorageConnectionString;
-		private string azureStorageContainerNameFormat;
-		private string azureStorageimageFilenameLatest;
-		private string azureStorageImageFilenameFormat;
+		private string azureStorageContainerNameLatestFormat;
+		private string azureStorageimageFilenameLatestFormat;
+		private string azureStorageContainerNameHistoryFormat;
+		private string azureStorageImageFilenameHistoryFormat;
 		private const string ImageFilenameLocal = "latest.jpg";
 		private volatile bool cameraBusy = false;
 
@@ -74,6 +78,15 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 			PackageVersion version = packageId.Version;
 			startupInformation.AddString("ApplicationVersion", string.Format($"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}"));
 
+			// ethernet mac address
+			deviceMacAddress = NetworkInterface.GetAllNetworkInterfaces()
+				 .Where(i => i.NetworkInterfaceType.ToString().ToLower().Contains("ethernet"))
+				 .FirstOrDefault()
+				 ?.GetPhysicalAddress().ToString();
+
+			// remove unsupported charachers from MacAddress
+			deviceMacAddress = deviceMacAddress.Replace("-", "").Replace(" ", "").Replace(":", "");
+
 			try
 			{
 				// see if the configuration file is present if not copy minimal sample one from application directory
@@ -88,14 +101,17 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 				azureStorageConnectionString = configuration.GetSection("AzureStorageConnectionString").Value;
 				startupInformation.AddString("AzureStorageConnectionString", azureStorageConnectionString);
 
-				azureStorageContainerNameFormat = configuration.GetSection("AzureContainerNameFormat").Value;
-				startupInformation.AddString("ContainerNameFormat", azureStorageContainerNameFormat);
+				azureStorageContainerNameLatestFormat = configuration.GetSection("AzureContainerNameFormatLatest").Value;
+				startupInformation.AddString("ContainerNameLatestFormat", azureStorageContainerNameLatestFormat);
 
-				azureStorageImageFilenameFormat = configuration.GetSection("AzureImageFilenameFormat").Value;
-				startupInformation.AddString("ImageFilenameFormat", azureStorageImageFilenameFormat);
+				azureStorageimageFilenameLatestFormat = configuration.GetSection("AzureImageFilenameFormatLatest").Value;
+				startupInformation.AddString("ImageFilenameLatestFormat", azureStorageimageFilenameLatestFormat);
 
-				azureStorageimageFilenameLatest = configuration.GetSection("AzureImageFilenameLatest").Value;
-				startupInformation.AddString("ImageFilenameLatest", azureStorageimageFilenameLatest);
+				azureStorageContainerNameHistoryFormat = configuration.GetSection("AzureContainerNameFormatHistory").Value;
+				startupInformation.AddString("ContainerNameHistoryFormat", azureStorageContainerNameHistoryFormat);
+
+				azureStorageImageFilenameHistoryFormat = configuration.GetSection("AzureImageFilenameFormatHistory").Value;
+				startupInformation.AddString("ImageFilenameHistoryFormat", azureStorageImageFilenameHistoryFormat);
 
 				interruptPinNumber = int.Parse( configuration.GetSection("InterruptPinNumber").Value);
 				startupInformation.AddInt32("Interrupt pin", interruptPinNumber);
@@ -159,30 +175,46 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 				ImageEncodingProperties imageProperties = ImageEncodingProperties.CreateJpeg();
 				await mediaCapture.CapturePhotoToStorageFileAsync(imageProperties, photoFile);
 
-				string azureContainername = string.Format(azureStorageContainerNameFormat, Environment.MachineName.ToLower(), currentTime);
-				string azureStoragefilename = string.Format(azureStorageImageFilenameFormat, Environment.MachineName.ToLower(), currentTime);
+				string azureContainernameLatest = string.Format(azureStorageContainerNameLatestFormat, Environment.MachineName, deviceMacAddress, currentTime).ToLower();
+				string azureFilenameLatest = string.Format(azureStorageimageFilenameLatestFormat, Environment.MachineName, deviceMacAddress, currentTime);
+				string azureContainerNameHistory = string.Format(azureStorageContainerNameHistoryFormat, Environment.MachineName, deviceMacAddress, currentTime).ToLower();
+				string azureFilenameHistory = string.Format(azureStorageImageFilenameHistoryFormat, Environment.MachineName.ToLower(), deviceMacAddress, currentTime);
 
 				LoggingFields imageInformation = new LoggingFields();
 				imageInformation.AddDateTime("TakenAtUTC", currentTime);
 				imageInformation.AddString("LocalFilename", photoFile.Path);
-				imageInformation.AddString("AzureContainerName", azureContainername);
-				imageInformation.AddString("AzureStorageFilename", azureStoragefilename);
-				imageInformation.AddString("AzureStorageFilenameLatest", azureStorageimageFilenameLatest);
-				this.logging.LogEvent("Image saving to Azure storage", imageInformation);
+				imageInformation.AddString("AzureContainerNameLatest", azureContainernameLatest);
+				imageInformation.AddString("AzureFilenameLatest", azureFilenameLatest);
+				imageInformation.AddString("AzureContainerNameHistory", azureContainerNameHistory);
+				imageInformation.AddString("AzureFilenameHistory", azureFilenameHistory);
+				this.logging.LogEvent("Saving image(s) to Azure storage", imageInformation);
 
 				CloudStorageAccount storageAccount = CloudStorageAccount.Parse(azureStorageConnectionString);
 				CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 
-				CloudBlobContainer container = blobClient.GetContainerReference(azureContainername);
-				await container.CreateIfNotExistsAsync();
+				// Update the latest image in storage
+				if (!string.IsNullOrWhiteSpace(azureContainernameLatest) && !string.IsNullOrWhiteSpace(azureFilenameLatest))
+				{
+					CloudBlobContainer containerLatest = blobClient.GetContainerReference(azureContainernameLatest);
+					await containerLatest.CreateIfNotExistsAsync();
 
-				CloudBlockBlob blockBlob = container.GetBlockBlobReference(azureStoragefilename);
-				await blockBlob.UploadFromFileAsync(photoFile);
+					CloudBlockBlob blockBlobLatest = containerLatest.GetBlockBlobReference(azureFilenameLatest);
+					await blockBlobLatest.UploadFromFileAsync(photoFile);
 
-				blockBlob = container.GetBlockBlobReference(azureStorageimageFilenameLatest);
-				await blockBlob.UploadFromFileAsync(photoFile);
+					this.logging.LogEvent("Image latest saved to Azure storage");
+				}
 
-				this.logging.LogEvent("Image saved to Azure storage");
+				// Upload the historic image to storage
+				if (!string.IsNullOrWhiteSpace(azureContainerNameHistory) && !string.IsNullOrWhiteSpace(azureFilenameHistory))
+				{
+					CloudBlobContainer containerHistory = blobClient.GetContainerReference(azureContainerNameHistory);
+					await containerHistory.CreateIfNotExistsAsync();
+
+					CloudBlockBlob blockBlob = containerHistory.GetBlockBlobReference(azureFilenameHistory);
+					await blockBlob.UploadFromFileAsync(photoFile);
+
+					this.logging.LogEvent("Image historic saved to Azure storage");
+				}
 			}
 			catch (Exception ex)
 			{
