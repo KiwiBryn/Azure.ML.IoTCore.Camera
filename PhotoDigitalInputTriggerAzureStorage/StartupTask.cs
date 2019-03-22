@@ -27,6 +27,8 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 	using System;
 	using System.IO;
 	using System.Diagnostics;
+	using System.Linq;
+	using System.Net.NetworkInformation;
 
 	using Microsoft.Extensions.Configuration;
 	using Microsoft.WindowsAzure.Storage;
@@ -40,8 +42,6 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 	using Windows.Media.MediaProperties;
 	using Windows.Storage;
 	using Windows.System;
-	using System.Net.NetworkInformation;
-	using System.Linq;
 
 	public sealed class StartupTask : IBackgroundTask
 	{
@@ -86,6 +86,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 
 			// remove unsupported charachers from MacAddress
 			deviceMacAddress = deviceMacAddress.Replace("-", "").Replace(" ", "").Replace(":", "");
+			startupInformation.AddString("MacAddress", deviceMacAddress);
 
 			try
 			{
