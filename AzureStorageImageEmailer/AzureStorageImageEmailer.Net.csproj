@@ -2,6 +2,8 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <AzureFunctionsVersion>v1</AzureFunctionsVersion>
+    <AssemblyName>AzureStorageImageEmailerNet</AssemblyName>
+    <RootNamespace>devMobile.Azure.Storage.AzureStorageImageEmailer</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.SendGrid" Version="2.0.0" />

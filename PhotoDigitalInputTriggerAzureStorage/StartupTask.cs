@@ -25,6 +25,7 @@
 namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 {
 	using System;
+	using System.IO;
 	using System.Diagnostics;
 
 	using Microsoft.Extensions.Configuration;
@@ -82,7 +83,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 					templateConfigurationfile.CopyAsync(localFolder, ConfigurationFilename).AsTask();
 				}
 
-				IConfiguration configuration = new ConfigurationBuilder().AddJsonFile(localFolder.Path + @"\" + ConfigurationFilename, false, true).Build();
+				IConfiguration configuration = new ConfigurationBuilder().AddJsonFile(Path.Combine(localFolder.Path, ConfigurationFilename), false, true).Build();
 
 				azureStorageConnectionString = configuration.GetSection("AzureStorageConnectionString").Value;
 				startupInformation.AddString("AzureStorageConnectionString", azureStorageConnectionString);

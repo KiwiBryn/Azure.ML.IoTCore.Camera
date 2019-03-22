@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomVisionServiceDigitalI
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoDigitalInputTriggerAzureStorage", "PhotoDigitalInputTriggerAzureStorage\PhotoDigitalInputTriggerAzureStorage.csproj", "{7803B1BC-DAAE-4187-98A1-E87DDBECA129}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureStorageImageEmailer", "AzureStorageImageEmailer\AzureStorageImageEmailer.csproj", "{B96AD80A-8D6A-4DEB-B88D-C0D56842AFA6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureStorageImageEmailer.Net", "AzureStorageImageEmailer\AzureStorageImageEmailer.Net.csproj", "{B96AD80A-8D6A-4DEB-B88D-C0D56842AFA6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
