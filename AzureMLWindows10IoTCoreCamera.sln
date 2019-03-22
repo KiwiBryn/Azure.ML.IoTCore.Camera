@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoDigitalInputTriggerAzu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureStorageImageEmailer.Net", "AzureStorageImageEmailer\AzureStorageImageEmailer.Net.csproj", "{B96AD80A-8D6A-4DEB-B88D-C0D56842AFA6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoTimerTriggerAzureStorage", "PhotoTimerTriggerAzureStorage\PhotoTimerTriggerAzureStorage.csproj", "{777F77E1-8F7A-4074-A2A9-FA6378072B81}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -143,6 +145,26 @@ Global
 		{B96AD80A-8D6A-4DEB-B88D-C0D56842AFA6}.Release|x64.Build.0 = Release|Any CPU
 		{B96AD80A-8D6A-4DEB-B88D-C0D56842AFA6}.Release|x86.ActiveCfg = Release|Any CPU
 		{B96AD80A-8D6A-4DEB-B88D-C0D56842AFA6}.Release|x86.Build.0 = Release|Any CPU
+		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Debug|ARM.ActiveCfg = Debug|ARM
+		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Debug|ARM.Build.0 = Debug|ARM
+		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Debug|ARM.Deploy.0 = Debug|ARM
+		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Debug|x64.ActiveCfg = Debug|x64
+		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Debug|x64.Build.0 = Debug|x64
+		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Debug|x64.Deploy.0 = Debug|x64
+		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Debug|x86.ActiveCfg = Debug|x86
+		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Debug|x86.Build.0 = Debug|x86
+		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Debug|x86.Deploy.0 = Debug|x86
+		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Release|Any CPU.ActiveCfg = Release|x86
+		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Release|ARM.ActiveCfg = Release|ARM
+		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Release|ARM.Build.0 = Release|ARM
+		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Release|ARM.Deploy.0 = Release|ARM
+		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Release|x64.ActiveCfg = Release|x64
+		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Release|x64.Build.0 = Release|x64
+		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Release|x64.Deploy.0 = Release|x64
+		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Release|x86.ActiveCfg = Release|x86
+		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Release|x86.Build.0 = Release|x86
+		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
