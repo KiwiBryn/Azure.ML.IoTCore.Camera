@@ -49,7 +49,10 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 		private readonly LoggingChannel logging = new LoggingChannel("devMobile Photo Digital Input Trigger Azure Storage demo", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
 		private const string ConfigurationFilename = "appsettings.json";
 		private GpioPin interruptGpioPin = null;
+		private GpioPinEdge interruptTriggerOn = GpioPinEdge.RisingEdge;
 		private int interruptPinNumber;
+		private TimeSpan debounceTimeout;
+		private DateTime imageLastCapturedAtUtc = DateTime.MinValue;
 		private MediaCapture mediaCapture;
 		private string deviceMacAddress;
 		private string azureStorageConnectionString;
@@ -116,6 +119,12 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 
 				interruptPinNumber = int.Parse( configuration.GetSection("InterruptPinNumber").Value);
 				startupInformation.AddInt32("Interrupt pin", interruptPinNumber);
+
+				interruptTriggerOn = (GpioPinEdge)Enum.Parse(typeof(GpioPinEdge), configuration.GetSection("interruptTriggerOn").Value);
+				startupInformation.AddString("Interrupt Trigger on", interruptTriggerOn.ToString());
+
+				debounceTimeout = TimeSpan.Parse(configuration.GetSection("debounceTimeout").Value);
+				startupInformation.AddTimeSpan("Debounce timeout", debounceTimeout);
 			}
 			catch (Exception ex)
 			{
@@ -158,10 +167,17 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 			DateTime currentTime = DateTime.UtcNow;
 			Debug.WriteLine($"{DateTime.UtcNow.ToLongTimeString()} Digital Input Interrupt {sender.PinNumber} triggered {args.Edge}");
 
-			if (args.Edge == GpioPinEdge.RisingEdge)
+			if (args.Edge == interruptTriggerOn)
 			{
 				return;
 			}
+
+			// Check that enough time has passed for picture to be taken
+			if ((currentTime - imageLastCapturedAtUtc) < debounceTimeout)
+			{
+				return;
+			}
+			imageLastCapturedAtUtc = currentTime;
 
 			// Just incase - stop code being called while photo already in progress
 			if (cameraBusy)
