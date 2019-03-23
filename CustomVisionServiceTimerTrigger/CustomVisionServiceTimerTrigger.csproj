@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProjectGuid>{8FEDCE9C-9EA7-472E-A0C0-B0836C131B98}</ProjectGuid>
+    <ProjectGuid>{E7AFCE04-6C23-482D-9CF3-F38F77DA3DF6}</ProjectGuid>
     <OutputType>winmdobj</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>devMobile.Windows10IotCore.IoT.CustomVisionServiceDigitalInputTrigger</RootNamespace>
-    <AssemblyName>CustomVisionServiceDigitalInputTrigger</AssemblyName>
+    <RootNamespace>CustomVisionServiceTimerTrigger</RootNamespace>
+    <AssemblyName>CustomVisionServiceTimerTrigger</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion>10.0.17763.0</TargetPlatformVersion>
@@ -18,7 +18,7 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <AllowCrossPlatformRetargeting>false</AllowCrossPlatformRetargeting>
-    <PackageCertificateKeyFile>CustomVisionServiceDigitalInputTrigger_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>CustomVisionServiceTimerTrigger_TemporaryKey.pfx</PackageCertificateKeyFile>
     <AppxPackage>true</AppxPackage>
     <ContainsStartupTask>true</ContainsStartupTask>
   </PropertyGroup>
@@ -102,7 +102,7 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
-    <None Include="CustomVisionServiceDigitalInputTrigger_TemporaryKey.pfx" />
+    <None Include="CustomVisionServiceTimerTrigger_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Properties\Default.rd.xml" />
@@ -129,14 +129,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json">
-      <Version>3.0.0-preview3.19153.1</Version>
-    </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.2.3</Version>
-    </PackageReference>
-    <PackageReference Include="System.Configuration.ConfigurationManager">
-      <Version>4.6.0-preview3.19128.7</Version>
+      <Version>6.2.7</Version>
     </PackageReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '15.0' ">
