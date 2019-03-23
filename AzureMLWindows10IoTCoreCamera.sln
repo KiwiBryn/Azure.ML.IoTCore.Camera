@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureStorageImageEmailer.Ne
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoTimerTriggerAzureStorage", "PhotoTimerTriggerAzureStorage\PhotoTimerTriggerAzureStorage.csproj", "{777F77E1-8F7A-4074-A2A9-FA6378072B81}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoDigitalInputTriggerLocalStorage", "PhotoDigitalInputTriggerLocalStorage\PhotoDigitalInputTriggerLocalStorage.csproj", "{BC2CE56A-95FB-4F66-9311-414637D39F5C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -165,6 +167,26 @@ Global
 		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Release|x86.ActiveCfg = Release|x86
 		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Release|x86.Build.0 = Release|x86
 		{777F77E1-8F7A-4074-A2A9-FA6378072B81}.Release|x86.Deploy.0 = Release|x86
+		{BC2CE56A-95FB-4F66-9311-414637D39F5C}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{BC2CE56A-95FB-4F66-9311-414637D39F5C}.Debug|ARM.ActiveCfg = Debug|ARM
+		{BC2CE56A-95FB-4F66-9311-414637D39F5C}.Debug|ARM.Build.0 = Debug|ARM
+		{BC2CE56A-95FB-4F66-9311-414637D39F5C}.Debug|ARM.Deploy.0 = Debug|ARM
+		{BC2CE56A-95FB-4F66-9311-414637D39F5C}.Debug|x64.ActiveCfg = Debug|x64
+		{BC2CE56A-95FB-4F66-9311-414637D39F5C}.Debug|x64.Build.0 = Debug|x64
+		{BC2CE56A-95FB-4F66-9311-414637D39F5C}.Debug|x64.Deploy.0 = Debug|x64
+		{BC2CE56A-95FB-4F66-9311-414637D39F5C}.Debug|x86.ActiveCfg = Debug|x86
+		{BC2CE56A-95FB-4F66-9311-414637D39F5C}.Debug|x86.Build.0 = Debug|x86
+		{BC2CE56A-95FB-4F66-9311-414637D39F5C}.Debug|x86.Deploy.0 = Debug|x86
+		{BC2CE56A-95FB-4F66-9311-414637D39F5C}.Release|Any CPU.ActiveCfg = Release|x86
+		{BC2CE56A-95FB-4F66-9311-414637D39F5C}.Release|ARM.ActiveCfg = Release|ARM
+		{BC2CE56A-95FB-4F66-9311-414637D39F5C}.Release|ARM.Build.0 = Release|ARM
+		{BC2CE56A-95FB-4F66-9311-414637D39F5C}.Release|ARM.Deploy.0 = Release|ARM
+		{BC2CE56A-95FB-4F66-9311-414637D39F5C}.Release|x64.ActiveCfg = Release|x64
+		{BC2CE56A-95FB-4F66-9311-414637D39F5C}.Release|x64.Build.0 = Release|x64
+		{BC2CE56A-95FB-4F66-9311-414637D39F5C}.Release|x64.Deploy.0 = Release|x64
+		{BC2CE56A-95FB-4F66-9311-414637D39F5C}.Release|x86.ActiveCfg = Release|x86
+		{BC2CE56A-95FB-4F66-9311-414637D39F5C}.Release|x86.Build.0 = Release|x86
+		{BC2CE56A-95FB-4F66-9311-414637D39F5C}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
