@@ -46,7 +46,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerInputTriggerAzureStorage
 	public sealed class StartupTask : IBackgroundTask
 	{
 		private BackgroundTaskDeferral backgroundTaskDeferral = null;
-		private readonly LoggingChannel logging = new LoggingChannel("devMobile Photo Timer Trigger Azure Storage demo", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
+		private readonly LoggingChannel logging = new LoggingChannel("devMobile Photo Timer Trigger Azure Storage", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
 		private const string ConfigurationFilename = "appsettings.json";
 		private Timer ImageUpdatetimer;
 		private MediaCapture mediaCapture;
@@ -67,7 +67,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerInputTriggerAzureStorage
 
 			this.logging.LogEvent("Application starting");
 
-			// Log the Application build, shield information etc.
+			// Log the Application build, OS version information etc.
 			LoggingFields startupInformation = new LoggingFields();
 			startupInformation.AddString("Timezone", TimeZoneSettings.CurrentTimeZoneDisplayName);
 			startupInformation.AddString("OSVersion", Environment.OSVersion.VersionString);
