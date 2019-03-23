@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:iot="http://schemas.microsoft.com/appx/manifest/iot/windows10" xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3" xmlns:uap6="http://schemas.microsoft.com/appx/manifest/uap/windows10/6" xmlns:uap4="http://schemas.microsoft.com/appx/manifest/uap/windows10/4" xmlns:uap2="http://schemas.microsoft.com/appx/manifest/uap/windows10/2" xmlns:mobile="http://schemas.microsoft.com/appx/manifest/mobile/windows10" IgnorableNamespaces="uap mp iot uap3 uap6 uap4 uap2 mobile">
-  <Identity Name="PhotoDigitalInputTriggerAzureStorage-uwp" Publisher="CN=Bryn.Lewis" Version="1.0.0.0" />
+  <Identity Name="PhotoDigitalInputTriggerAzureStorage-uwp" Publisher="CN=Bryn.Lewis" Version="1.1.0.0" />
   <mp:PhoneIdentity PhoneProductId="883c300c-11fb-45d0-a6b2-6b1efe4e1c1d" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>PhotoDigitalInputTriggerAzureStorage</DisplayName>
