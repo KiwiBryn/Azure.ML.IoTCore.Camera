@@ -98,6 +98,9 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerAzureStorage
 				{
 					StorageFile templateConfigurationfile = Package.Current.InstalledLocation.GetFileAsync(ConfigurationFilename).AsTask().Result;
 					templateConfigurationfile.CopyAsync(localFolder, ConfigurationFilename).AsTask();
+
+					this.logging.LogMessage("JSON configuration file missing, templated created", LoggingLevel.Warning);
+					return;
 				}
 
 				IConfiguration configuration = new ConfigurationBuilder().AddJsonFile(Path.Combine(localFolder.Path, ConfigurationFilename), false, true).Build();
