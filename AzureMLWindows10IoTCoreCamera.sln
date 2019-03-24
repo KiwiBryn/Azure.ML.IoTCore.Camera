@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoDigitalInputTriggerLoc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoTimerTriggerLocalStorage", "PhotoTimerTriggerLocalStorage\PhotoTimerTriggerLocalStorage.csproj", "{92CBDD9C-14E5-490D-8CF9-698889956E8E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomVisionServiceTimerTrigger", "CustomVisionServiceTimerTrigger\CustomVisionServiceTimerTrigger.csproj", "{E7AFCE04-6C23-482D-9CF3-F38F77DA3DF6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -209,6 +211,26 @@ Global
 		{92CBDD9C-14E5-490D-8CF9-698889956E8E}.Release|x86.ActiveCfg = Release|x86
 		{92CBDD9C-14E5-490D-8CF9-698889956E8E}.Release|x86.Build.0 = Release|x86
 		{92CBDD9C-14E5-490D-8CF9-698889956E8E}.Release|x86.Deploy.0 = Release|x86
+		{E7AFCE04-6C23-482D-9CF3-F38F77DA3DF6}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{E7AFCE04-6C23-482D-9CF3-F38F77DA3DF6}.Debug|ARM.ActiveCfg = Debug|ARM
+		{E7AFCE04-6C23-482D-9CF3-F38F77DA3DF6}.Debug|ARM.Build.0 = Debug|ARM
+		{E7AFCE04-6C23-482D-9CF3-F38F77DA3DF6}.Debug|ARM.Deploy.0 = Debug|ARM
+		{E7AFCE04-6C23-482D-9CF3-F38F77DA3DF6}.Debug|x64.ActiveCfg = Debug|x64
+		{E7AFCE04-6C23-482D-9CF3-F38F77DA3DF6}.Debug|x64.Build.0 = Debug|x64
+		{E7AFCE04-6C23-482D-9CF3-F38F77DA3DF6}.Debug|x64.Deploy.0 = Debug|x64
+		{E7AFCE04-6C23-482D-9CF3-F38F77DA3DF6}.Debug|x86.ActiveCfg = Debug|x86
+		{E7AFCE04-6C23-482D-9CF3-F38F77DA3DF6}.Debug|x86.Build.0 = Debug|x86
+		{E7AFCE04-6C23-482D-9CF3-F38F77DA3DF6}.Debug|x86.Deploy.0 = Debug|x86
+		{E7AFCE04-6C23-482D-9CF3-F38F77DA3DF6}.Release|Any CPU.ActiveCfg = Release|x86
+		{E7AFCE04-6C23-482D-9CF3-F38F77DA3DF6}.Release|ARM.ActiveCfg = Release|ARM
+		{E7AFCE04-6C23-482D-9CF3-F38F77DA3DF6}.Release|ARM.Build.0 = Release|ARM
+		{E7AFCE04-6C23-482D-9CF3-F38F77DA3DF6}.Release|ARM.Deploy.0 = Release|ARM
+		{E7AFCE04-6C23-482D-9CF3-F38F77DA3DF6}.Release|x64.ActiveCfg = Release|x64
+		{E7AFCE04-6C23-482D-9CF3-F38F77DA3DF6}.Release|x64.Build.0 = Release|x64
+		{E7AFCE04-6C23-482D-9CF3-F38F77DA3DF6}.Release|x64.Deploy.0 = Release|x64
+		{E7AFCE04-6C23-482D-9CF3-F38F77DA3DF6}.Release|x86.ActiveCfg = Release|x86
+		{E7AFCE04-6C23-482D-9CF3-F38F77DA3DF6}.Release|x86.Build.0 = Release|x86
+		{E7AFCE04-6C23-482D-9CF3-F38F77DA3DF6}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
