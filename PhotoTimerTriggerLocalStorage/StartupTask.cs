@@ -27,8 +27,6 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerLocalStorage
 	using System;
 	using System.IO;
 	using System.Diagnostics;
-	using System.Linq;
-	using System.Net.NetworkInformation;
 	using System.Threading;
 
 	using Microsoft.Extensions.Configuration;
@@ -48,13 +46,9 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerLocalStorage
 		private const string ConfigurationFilename = "appsettings.json";
 		private Timer ImageUpdatetimer;
 		private MediaCapture mediaCapture;
-		private string deviceMacAddress;
-		private string azureStorageConnectionString;
-		private string azureStorageContainerNameLatestFormat;
-		private string azureStorageimageFilenameLatestFormat;
-		private string azureStorageContainerNameHistoryFormat;
-		private string azureStorageImageFilenameHistoryFormat;
-		private const string ImageFilenameLocal = "latest.jpg";
+		private string localImageFilenameLatestFormat;
+		private string localFolderNameHistoryFormat;
+		private string localImageFilenameHistoryFormat;
 		private volatile bool cameraBusy = false;
 
 		public void Run(IBackgroundTaskInstance taskInstance)
@@ -77,16 +71,6 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerLocalStorage
 			PackageVersion version = packageId.Version;
 			startupInformation.AddString("ApplicationVersion", string.Format($"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}"));
 
-			// ethernet mac address
-			deviceMacAddress = NetworkInterface.GetAllNetworkInterfaces()
-				 .Where(i => i.NetworkInterfaceType.ToString().ToLower().Contains("ethernet"))
-				 .FirstOrDefault()
-				 ?.GetPhysicalAddress().ToString();
-
-			// remove unsupported charachers from MacAddress
-			deviceMacAddress = deviceMacAddress.Replace("-", "").Replace(" ", "").Replace(":", "");
-			startupInformation.AddString("MacAddress", deviceMacAddress);
-
 			try
 			{
 				// see if the configuration file is present if not copy minimal sample one from application directory
@@ -98,20 +82,14 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerLocalStorage
 
 				IConfiguration configuration = new ConfigurationBuilder().AddJsonFile(Path.Combine(localFolder.Path, ConfigurationFilename), false, true).Build();
 
-				azureStorageConnectionString = configuration.GetSection("AzureStorageConnectionString").Value;
-				startupInformation.AddString("AzureStorageConnectionString", azureStorageConnectionString);
+				localImageFilenameLatestFormat = configuration.GetSection("ImageFilenameFormatLatest").Value;
+				startupInformation.AddString("ImageFilenameLatestFormat", localImageFilenameLatestFormat);
 
-				azureStorageContainerNameLatestFormat = configuration.GetSection("AzureContainerNameFormatLatest").Value;
-				startupInformation.AddString("ContainerNameLatestFormat", azureStorageContainerNameLatestFormat);
+				localFolderNameHistoryFormat = configuration.GetSection("FolderNameFormatHistory").Value;
+				startupInformation.AddString("ContainerNameHistoryFormat", localFolderNameHistoryFormat);
 
-				azureStorageimageFilenameLatestFormat = configuration.GetSection("AzureImageFilenameFormatLatest").Value;
-				startupInformation.AddString("ImageFilenameLatestFormat", azureStorageimageFilenameLatestFormat);
-
-				azureStorageContainerNameHistoryFormat = configuration.GetSection("AzureContainerNameFormatHistory").Value;
-				startupInformation.AddString("ContainerNameHistoryFormat", azureStorageContainerNameHistoryFormat);
-
-				azureStorageImageFilenameHistoryFormat = configuration.GetSection("AzureImageFilenameFormatHistory").Value;
-				startupInformation.AddString("ImageFilenameHistoryFormat", azureStorageImageFilenameHistoryFormat);
+				localImageFilenameHistoryFormat = configuration.GetSection("ImageFilenameFormatHistory").Value;
+				startupInformation.AddString("ImageFilenameHistoryFormat", localImageFilenameHistoryFormat);
 
 				imageUpdateDueSeconds = int.Parse(configuration.GetSection("ImageUpdateDueSeconds").Value);
 				startupInformation.AddInt32("ImageUpdateDueSeconds", imageUpdateDueSeconds);
@@ -158,52 +136,36 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerLocalStorage
 
 			try
 			{
-				StorageFile photoFile = await KnownFolders.PicturesLibrary.CreateFileAsync(ImageFilenameLocal, CreationCollisionOption.ReplaceExisting);
+				string localFilename = string.Format(localImageFilenameLatestFormat, currentTime);
+
+				StorageFile photoFile = await KnownFolders.PicturesLibrary.CreateFileAsync(localFilename, CreationCollisionOption.ReplaceExisting);
 				ImageEncodingProperties imageProperties = ImageEncodingProperties.CreateJpeg();
 				await mediaCapture.CapturePhotoToStorageFileAsync(imageProperties, photoFile);
 
-				/*
-				string azureContainernameLatest = string.Format(azureStorageContainerNameLatestFormat, Environment.MachineName, deviceMacAddress, currentTime).ToLower();
-				string azureFilenameLatest = string.Format(azureStorageimageFilenameLatestFormat, Environment.MachineName, deviceMacAddress, currentTime);
-				string azureContainerNameHistory = string.Format(azureStorageContainerNameHistoryFormat, Environment.MachineName, deviceMacAddress, currentTime).ToLower();
-				string azureFilenameHistory = string.Format(azureStorageImageFilenameHistoryFormat, Environment.MachineName.ToLower(), deviceMacAddress, currentTime);
+				// See if the historic images folder exists, do this every time and folder name may changed
+				string folderNameHistory = string.Format(localFolderNameHistoryFormat, currentTime);
+				string filenameHistory = string.Format(localImageFilenameHistoryFormat, currentTime);
 
 				LoggingFields imageInformation = new LoggingFields();
 				imageInformation.AddDateTime("TakenAtUTC", currentTime);
 				imageInformation.AddString("LocalFilename", photoFile.Path);
-				imageInformation.AddString("AzureContainerNameLatest", azureContainernameLatest);
-				imageInformation.AddString("AzureFilenameLatest", azureFilenameLatest);
-				imageInformation.AddString("AzureContainerNameHistory", azureContainerNameHistory);
-				imageInformation.AddString("AzureFilenameHistory", azureFilenameHistory);
+				imageInformation.AddString("folderNameHistory", folderNameHistory);
+				imageInformation.AddString("filenameHistory", filenameHistory);
 				this.logging.LogEvent("Saving image(s) to Azure storage", imageInformation);
 
-				CloudStorageAccount storageAccount = CloudStorageAccount.Parse(azureStorageConnectionString);
-				CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-
-				// Update the latest image in storage
-				if (!string.IsNullOrWhiteSpace(azureContainernameLatest) && !string.IsNullOrWhiteSpace(azureFilenameLatest))
-				{
-					CloudBlobContainer containerLatest = blobClient.GetContainerReference(azureContainernameLatest);
-					await containerLatest.CreateIfNotExistsAsync();
-
-					CloudBlockBlob blockBlobLatest = containerLatest.GetBlockBlobReference(azureFilenameLatest);
-					await blockBlobLatest.UploadFromFileAsync(photoFile);
-
-					this.logging.LogEvent("Image latest saved to Azure storage");
-				}
-
 				// Upload the historic image to storage
-				if (!string.IsNullOrWhiteSpace(azureContainerNameHistory) && !string.IsNullOrWhiteSpace(azureFilenameHistory))
+				if (!string.IsNullOrWhiteSpace(folderNameHistory) && !string.IsNullOrWhiteSpace(filenameHistory))
 				{
-					CloudBlobContainer containerHistory = blobClient.GetContainerReference(azureContainerNameHistory);
-					await containerHistory.CreateIfNotExistsAsync();
-
-					CloudBlockBlob blockBlob = containerHistory.GetBlockBlobReference(azureFilenameHistory);
-					await blockBlob.UploadFromFileAsync(photoFile);
+					// Check to see if historic images folder exists and if it doesn't create it
+					IStorageFolder storageFolder = (IStorageFolder)await KnownFolders.PicturesLibrary.TryGetItemAsync(folderNameHistory);
+					if (storageFolder == null)
+					{
+						storageFolder = await KnownFolders.PicturesLibrary.CreateFolderAsync(folderNameHistory);
+					}
+					await photoFile.CopyAsync(storageFolder, filenameHistory, NameCollisionOption.ReplaceExisting);
 
 					this.logging.LogEvent("Image historic saved to Azure storage");
 				}
-				*/
 			}
 			catch (Exception ex)
 			{

@@ -7,7 +7,7 @@
     <ProjectGuid>{92CBDD9C-14E5-490D-8CF9-698889956E8E}</ProjectGuid>
     <OutputType>winmdobj</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PhotoTimerTriggerLocalStorage</RootNamespace>
+    <RootNamespace>devMobile.Windows10IotCore.IoT.PhotoTimerTriggerLocalStorage</RootNamespace>
     <AssemblyName>PhotoTimerTriggerLocalStorage</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
@@ -102,6 +102,9 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <Content Include="AppSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="PhotoTimerTriggerLocalStorage_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
