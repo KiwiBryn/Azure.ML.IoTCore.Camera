@@ -78,7 +78,8 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerLocalStorage
 				{
 					StorageFile templateConfigurationfile = Package.Current.InstalledLocation.GetFileAsync(ConfigurationFilename).AsTask().Result;
 					templateConfigurationfile.CopyAsync(localFolder, ConfigurationFilename).AsTask();
-					this.logging.LogMessage("JSON configuration file missing templated created", LoggingLevel.Warning);
+
+					this.logging.LogMessage("JSON configuration file missing, templated created", LoggingLevel.Warning);
 					return;
 				}
 
