@@ -78,6 +78,8 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerLocalStorage
 				{
 					StorageFile templateConfigurationfile = Package.Current.InstalledLocation.GetFileAsync(ConfigurationFilename).AsTask().Result;
 					templateConfigurationfile.CopyAsync(localFolder, ConfigurationFilename).AsTask();
+					this.logging.LogMessage("JSON configuration file missing templated created", LoggingLevel.Warning);
+					return;
 				}
 
 				IConfiguration configuration = new ConfigurationBuilder().AddJsonFile(Path.Combine(localFolder.Path, ConfigurationFilename), false, true).Build();
@@ -137,21 +139,19 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerLocalStorage
 			try
 			{
 				string localFilename = string.Format(localImageFilenameLatestFormat, currentTime);
+				string folderNameHistory = string.Format(localFolderNameHistoryFormat, currentTime);
+				string filenameHistory = string.Format(localImageFilenameHistoryFormat, currentTime);
 
 				StorageFile photoFile = await KnownFolders.PicturesLibrary.CreateFileAsync(localFilename, CreationCollisionOption.ReplaceExisting);
 				ImageEncodingProperties imageProperties = ImageEncodingProperties.CreateJpeg();
 				await mediaCapture.CapturePhotoToStorageFileAsync(imageProperties, photoFile);
 
-				// See if the historic images folder exists, do this every time and folder name may changed
-				string folderNameHistory = string.Format(localFolderNameHistoryFormat, currentTime);
-				string filenameHistory = string.Format(localImageFilenameHistoryFormat, currentTime);
-
 				LoggingFields imageInformation = new LoggingFields();
 				imageInformation.AddDateTime("TakenAtUTC", currentTime);
 				imageInformation.AddString("LocalFilename", photoFile.Path);
-				imageInformation.AddString("folderNameHistory", folderNameHistory);
-				imageInformation.AddString("filenameHistory", filenameHistory);
-				this.logging.LogEvent("Saving image(s) to Azure storage", imageInformation);
+				imageInformation.AddString("FolderNameHistory", folderNameHistory);
+				imageInformation.AddString("FilenameHistory", filenameHistory);
+				this.logging.LogEvent("Image saved to local storage", imageInformation);
 
 				// Upload the historic image to storage
 				if (!string.IsNullOrWhiteSpace(folderNameHistory) && !string.IsNullOrWhiteSpace(filenameHistory))
@@ -164,12 +164,12 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerLocalStorage
 					}
 					await photoFile.CopyAsync(storageFolder, filenameHistory, NameCollisionOption.ReplaceExisting);
 
-					this.logging.LogEvent("Image historic saved to Azure storage");
+					this.logging.LogEvent("Image historic saved to local storage", imageInformation);
 				}
 			}
 			catch (Exception ex)
 			{
-				this.logging.LogMessage("Camera photo save or upload failed " + ex.Message, LoggingLevel.Error);
+				this.logging.LogMessage("Camera photo or image save failed " + ex.Message, LoggingLevel.Error);
 			}
 			finally
 			{
