@@ -3,7 +3,7 @@
   <Identity Name="PhotoDigitalInputTrigger-uwp" Publisher="CN=Bryn.Lewis" Version="1.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="35a4dcd4-ab81-40d1-90b1-d0571e859ac7" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>PhotoDigitalInputTrigger</DisplayName>
+    <DisplayName>devMobile Photo Timer Local Storage</DisplayName>
     <PublisherDisplayName>Bryn.Lewis</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>

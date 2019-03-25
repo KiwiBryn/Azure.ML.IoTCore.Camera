@@ -44,7 +44,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerLocalStorage
 	public sealed class StartupTask : IBackgroundTask
 	{
 		private BackgroundTaskDeferral backgroundTaskDeferral = null;
-		private readonly LoggingChannel logging = new LoggingChannel("devMobile Photo Digital Input Trigger Local Storage", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
+		private readonly LoggingChannel logging = new LoggingChannel("devMobile Photo Digital Input Local Storage", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
 		private const string ConfigurationFilename = "appsettings.json";
 		private GpioPin interruptGpioPin = null;
 		private GpioPinEdge interruptTriggerOn = GpioPinEdge.RisingEdge;
@@ -96,6 +96,9 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerLocalStorage
 				{
 					StorageFile templateConfigurationfile = Package.Current.InstalledLocation.GetFileAsync(ConfigurationFilename).AsTask().Result;
 					templateConfigurationfile.CopyAsync(localFolder, ConfigurationFilename).AsTask();
+
+					this.logging.LogMessage("JSON configuration file missing, templated created", LoggingLevel.Warning);
+					return;
 				}
 
 				IConfiguration configuration = new ConfigurationBuilder().AddJsonFile(Path.Combine(localFolder.Path, ConfigurationFilename), false, true).Build();

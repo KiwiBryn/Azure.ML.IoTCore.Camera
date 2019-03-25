@@ -35,7 +35,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTrigger
 
 	public sealed class StartupTask : IBackgroundTask
 	{
-		private readonly LoggingChannel logging = new LoggingChannel("devMobile Photo Digital Input Trigger demo", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
+		private readonly LoggingChannel logging = new LoggingChannel("devMobile Photo Digital Input demo", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
 		private BackgroundTaskDeferral backgroundTaskDeferral = null;
 		private GpioPin InterruptGpioPin = null;
 		private const int InterruptPinNumber = 5;

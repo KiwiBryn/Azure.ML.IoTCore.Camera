@@ -3,7 +3,7 @@
   <Identity Name="PhotoTimerTriggerAzureStorage-uwp" Publisher="CN=Bryn.Lewis" Version="1.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="39c7547e-29dc-40c6-9ba0-30299a17b1d8" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>PhotoTimerTriggerAzureStorage</DisplayName>
+    <DisplayName>devMobile Photo Timer Azure Storage</DisplayName>
     <PublisherDisplayName>Bryn.Lewis</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -15,7 +15,7 @@
   </Resources>
   <Applications>
     <Application Id="App">
-      <uap:VisualElements DisplayName="devMobile Photo Timer Azure Storage Upload" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="Windows 10 IoT Core application which shows how to use a timer as a trigger for taking a photo to upload to Azure Storge" BackgroundColor="transparent" AppListEntry="none">
+      <uap:VisualElements DisplayName="devMobile Photo Timer Azure Storage Upload" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="Windows 10 IoT Core application which shows how to use a timer as a trigger for taking a photo then uploading it to Azure Storge" BackgroundColor="transparent" AppListEntry="none">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png">
         </uap:DefaultTile>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />

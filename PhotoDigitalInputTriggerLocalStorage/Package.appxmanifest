@@ -3,7 +3,7 @@
   <Identity Name="PhotoDigitalInputTriggerLocalStorage-uwp" Publisher="CN=Bryn.Lewis" Version="1.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="18ff9fea-f523-4f1f-9e4c-0c77e632d86e" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>PhotoDigitalInputTriggerLocalStorage</DisplayName>
+    <DisplayName>devMobile Photo Digital Input Local Storage</DisplayName>
     <PublisherDisplayName>Bryn.Lewis</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
