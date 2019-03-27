@@ -7,7 +7,7 @@
     <ProjectGuid>{7A23F04D-7506-47F5-86E7-AA7B6DA0E8E6}</ProjectGuid>
     <OutputType>winmdobj</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PhotoTimerTriggerAzureIoTHubStorage</RootNamespace>
+    <RootNamespace>devMobile.Windows10IotCore.IoT.PhotoTimerTriggerAzureIoTHubStorage</RootNamespace>
     <AssemblyName>PhotoTimerTriggerAzureIoTHubStorage</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
@@ -102,6 +102,9 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <Content Include="AppSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="PhotoTimerTriggerAzureIoTHubStorage_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
@@ -129,8 +132,17 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.Devices.Client">
+      <Version>1.19.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration">
+      <Version>2.2.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json">
+      <Version>2.2.0</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.2.7</Version>
+      <Version>6.2.8</Version>
     </PackageReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '15.0' ">
