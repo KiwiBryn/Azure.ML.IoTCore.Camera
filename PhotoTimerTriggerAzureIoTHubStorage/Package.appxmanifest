@@ -3,7 +3,7 @@
   <Identity Name="PhotoTimerTriggerAzureIoTHubStorage-uwp" Publisher="CN=Bryn.Lewis" Version="1.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="39ed4399-8fcc-476c-a30f-d332336427a0" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>PhotoTimerTriggerAzureIoTHubStorage</DisplayName>
+    <DisplayName>devMobile Photo Timer Azure IoT Hub Storage</DisplayName>
     <PublisherDisplayName>Bryn.Lewis</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -15,7 +15,7 @@
   </Resources>
   <Applications>
     <Application Id="App">
-      <uap:VisualElements DisplayName="PhotoTimerTriggerAzureIoTHubStorage" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="PhotoTimerTriggerAzureIoTHubStorage" BackgroundColor="transparent" AppListEntry="none">
+      <uap:VisualElements DisplayName="devMobile Photo Timer Azure IoT Hub Storage Upload" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="Windows 10 IoT Core application which shows how to use a timer as a trigger for taking a photo then uploading it to Azure IoT Hub storage account" BackgroundColor="transparent" AppListEntry="none">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png">
         </uap:DefaultTile>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />

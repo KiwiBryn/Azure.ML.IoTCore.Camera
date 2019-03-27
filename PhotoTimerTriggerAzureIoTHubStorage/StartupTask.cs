@@ -49,6 +49,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerAzureIoTHubStorage
 		private Timer ImageUpdatetimer;
 		private MediaCapture mediaCapture;
 		private string azureIoTHubConnectionString;
+		private TransportType transportType;
 		private string azureStorageimageFilenameLatestFormat;
 		private string azureStorageImageFilenameHistoryFormat;
 		private const string ImageFilenameLocal = "latest.jpg";
@@ -90,7 +91,10 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerAzureIoTHubStorage
 
 				azureIoTHubConnectionString = configuration.GetSection("AzureIoTHubConnectionString").Value;
 				startupInformation.AddString("AzureIoTHubConnectionString", azureIoTHubConnectionString);
-				
+
+				transportType = (TransportType)Enum.Parse( typeof(TransportType), configuration.GetSection("TransportType").Value);
+				startupInformation.AddString("TransportType", transportType.ToString());
+
 				azureStorageimageFilenameLatestFormat = configuration.GetSection("AzureImageFilenameFormatLatest").Value;
 				startupInformation.AddString("ImageFilenameLatestFormat", azureStorageimageFilenameLatestFormat);
 
@@ -111,7 +115,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerAzureIoTHubStorage
 
 			try
 			{
-				azureIoTHubClient = DeviceClient.CreateFromConnectionString(azureIoTHubConnectionString, TransportType.Mqtt);
+				azureIoTHubClient = DeviceClient.CreateFromConnectionString(azureIoTHubConnectionString, transportType);
 			}
 			catch (Exception ex)
 			{
