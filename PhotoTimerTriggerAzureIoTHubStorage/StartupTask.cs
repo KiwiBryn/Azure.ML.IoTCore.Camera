@@ -195,7 +195,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerAzureIoTHubStorage
 
 			ImageUpdatetimer = new Timer(ImageUpdateTimerCallback, null, new TimeSpan(0, 0, imageUpdateDueSeconds), new TimeSpan(0, 0, imageUpdatePeriodSeconds));
 
-			this.logging.LogEvent("Application completed");
+			this.logging.LogEvent("Application startup completed");
 
 			//enable task to continue running in background
 			backgroundTaskDeferral = taskInstance.GetDeferral();
@@ -205,7 +205,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerAzureIoTHubStorage
 		{
 			Debug.WriteLine($"{DateTime.UtcNow.ToString("yy-MM-ss HH:mm:ss")} Method handler triggered");
 
-			await ImageUpdate();
+			await ImageUpdate(true);
 
 			return new MethodResponse(200);
 		}
@@ -214,10 +214,10 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerAzureIoTHubStorage
 		{
 			Debug.WriteLine($"{DateTime.UtcNow.ToString("yy-MM-ss HH:mm:ss")} Timer triggered");
 
-			await ImageUpdate();
+			await ImageUpdate(false);
 		}
 
-		private async Task ImageUpdate()
+		private async Task ImageUpdate(bool isCommand)
 		{ 
 			DateTime currentTime = DateTime.UtcNow;
 
@@ -245,6 +245,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerAzureIoTHubStorage
 
 					LoggingFields imageInformation = new LoggingFields();
 					imageInformation.AddDateTime("TakenAtUTC", currentTime);
+					imageInformation.AddBoolean("IsCommand", isCommand);
 #if DEBUG
 					imageInformation.AddString("LocalFilename", photoFile.Path);
 #endif
