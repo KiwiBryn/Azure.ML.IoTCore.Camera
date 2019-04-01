@@ -5,10 +5,10 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("PhotoTimerTriggerAzureIoTHubStorage")]
+[assembly: AssemblyTitle("USB Camera Timer Trigger Upload to Azure IoT Hub Storage")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("devMobile Software")]
 [assembly: AssemblyProduct("PhotoTimerTriggerAzureIoTHubStorage")]
 [assembly: AssemblyCopyright("Copyright ©  2019")]
 [assembly: AssemblyTrademark("")]
