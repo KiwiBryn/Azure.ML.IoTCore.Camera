@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:iot="http://schemas.microsoft.com/appx/manifest/iot/windows10" IgnorableNamespaces="uap mp iot">
-  <Identity Name="PhotoTimerTriggerAzureIoTHubStorage-uwp" Publisher="CN=Bryn.Lewis" Version="1.1.0.0" />
+  <Identity Name="PhotoTimerTriggerAzureIoTHubStorage-uwp" Publisher="CN=Bryn.Lewis" Version="1.2.0.0" />
   <mp:PhoneIdentity PhoneProductId="39ed4399-8fcc-476c-a30f-d332336427a0" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>devMobile Photo Timer Azure IoT Hub Storage</DisplayName>
@@ -32,6 +32,7 @@
   <Capabilities>
     <Capability Name="internetClient" />
     <uap:Capability Name="picturesLibrary" />
+    <iot:Capability Name="systemManagement" />
     <DeviceCapability Name="microphone" />
     <DeviceCapability Name="webcam" />
   </Capabilities>
