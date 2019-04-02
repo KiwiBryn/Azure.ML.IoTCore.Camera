@@ -48,22 +48,24 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerAzureIoTHubStorage
 	{
 		private BackgroundTaskDeferral backgroundTaskDeferral = null;
 		private readonly LoggingChannel logging = new LoggingChannel("devMobile Photo Timer Azure IoT Hub Storage", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
-		private DeviceClient azureIoTHubClient = null;
 		private const string ConfigurationFilename = "appsettings.json";
-		private Timer ImageUpdatetimer;
-		private MediaCapture mediaCapture;
 		private string azureIoTHubConnectionString;
 		private TransportType transportType;
+		private DeviceClient azureIoTHubClient = null;
+		private MediaCapture mediaCapture;
+		private const string ImageFilenameLocal = "latest.jpg";
 		private string azureStorageimageFilenameLatestFormat;
 		private string azureStorageImageFilenameHistoryFormat;
-		private const string ImageFilenameLocal = "latest.jpg";
+		private Timer imageUpdatetimer;
 		private volatile bool cameraBusy = false;
+		private readonly TimeSpan DeviceRebootDelayPeriod = new TimeSpan(0, 0, 25);
 
 		public void Run(IBackgroundTaskInstance taskInstance)
 		{
 			StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-			int imageUpdateDueSeconds;
-			int imageUpdatePeriodSeconds;
+			Twin deviceTwin = null;
+			TimeSpan imageUpdateDue;
+			TimeSpan imageUpdatePeriod;
 
 			// Log the Application build, OS version information etc.
 			LoggingFields startupInformation = new LoggingFields();
@@ -92,33 +94,20 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerAzureIoTHubStorage
 					return;
 				}
 
+				LoggingFields connnectionInformation = new LoggingFields();
 				IConfiguration configuration = new ConfigurationBuilder().AddJsonFile(Path.Combine(localFolder.Path, ConfigurationFilename), false, true).Build();
 
-				LoggingFields configurationInformation = new LoggingFields();
-
 				azureIoTHubConnectionString = configuration.GetSection("AzureIoTHubConnectionString").Value;
-				configurationInformation.AddString("AzureIoTHubConnectionString", azureIoTHubConnectionString);
+				connnectionInformation.AddString("AzureIoTHubConnectionString", azureIoTHubConnectionString);
 
 				transportType = (TransportType)Enum.Parse( typeof(TransportType), configuration.GetSection("TransportType").Value);
-				configurationInformation.AddString("TransportType", transportType.ToString());
+				connnectionInformation.AddString("TransportType", transportType.ToString());
 
-				azureStorageimageFilenameLatestFormat = configuration.GetSection("AzureImageFilenameFormatLatest").Value;
-				configurationInformation.AddString("ImageFilenameLatestFormat", azureStorageimageFilenameLatestFormat);
-
-				azureStorageImageFilenameHistoryFormat = configuration.GetSection("AzureImageFilenameFormatHistory").Value;
-				configurationInformation.AddString("ImageFilenameHistoryFormat", azureStorageImageFilenameHistoryFormat);
-
-				imageUpdateDueSeconds = int.Parse(configuration.GetSection("ImageUpdateDueSeconds").Value);
-				configurationInformation.AddInt32("ImageUpdateDueSeconds", imageUpdateDueSeconds);
-
-				imageUpdatePeriodSeconds = int.Parse(configuration.GetSection("ImageUpdatePeriodSeconds").Value);
-				configurationInformation.AddInt32("ImageUpdatePeriodSeconds", imageUpdatePeriodSeconds);
-
-				this.logging.LogEvent("Application configuration", configurationInformation);
+				this.logging.LogEvent("Connection", connnectionInformation);
 			}
 			catch (Exception ex)
 			{
-				this.logging.LogMessage("JSON configuration file load or settings retrieval failed " + ex.Message, LoggingLevel.Error);
+				this.logging.LogMessage("JSON configuration file load or AzureIoT HUb connection settings missing/invalid" + ex.Message, LoggingLevel.Error);
 				return;
 			}
 			#endregion
@@ -135,11 +124,10 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerAzureIoTHubStorage
 			}
 			#endregion
 
-			#region Report device properties to AzureIoT Hub
+			#region Report device and application properties to AzureIoT Hub
 			try
 			{
-				TwinCollection reportedProperties;
-				reportedProperties = new TwinCollection();
+				TwinCollection reportedProperties = new TwinCollection();
 
 				// This is from the OS 
 				reportedProperties["Timezone"] = TimeZoneSettings.CurrentTimeZoneDisplayName;
@@ -163,7 +151,53 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerAzureIoTHubStorage
 			}
 			catch (Exception ex)
 			{
-				this.logging.LogMessage("Azure IoT Hub client UpdateReportedProperties failed " + ex.Message, LoggingLevel.Error);
+				this.logging.LogMessage("Azure IoT Hub client UpdateReportedPropertiesAsync failed " + ex.Message, LoggingLevel.Error);
+				return;
+			}
+			#endregion
+
+			#region Retrieve device twin settings
+			try
+			{
+				LoggingFields configurationInformation = new LoggingFields();
+
+				deviceTwin = azureIoTHubClient.GetTwinAsync().Result;
+
+				if (!deviceTwin.Properties.Desired.Contains("AzureImageFilenameLatestFormat"))
+				{
+					this.logging.LogMessage("DeviceTwin.Properties AzureImageFilenameLatestFormat setting missing", LoggingLevel.Warning);
+					return;
+				}
+				azureStorageimageFilenameLatestFormat = deviceTwin.Properties.Desired["AzureImageFilenameLatestFormat"].Value;
+				configurationInformation.AddString("AzureImageFilenameLatestFormat", azureStorageimageFilenameLatestFormat);
+
+				if (!deviceTwin.Properties.Desired.Contains("AzureImageFilenameHistoryFormat"))
+				{
+					this.logging.LogMessage("DeviceTwin.Properties AzureImageFilenameHistoryFormat setting missing", LoggingLevel.Warning);
+					return;
+				}
+				azureStorageImageFilenameHistoryFormat = deviceTwin.Properties.Desired["AzureImageFilenameHistoryFormat"].Value;
+				configurationInformation.AddString("AzureImageFilenameHistoryFormat", azureStorageImageFilenameHistoryFormat);
+
+				if (!deviceTwin.Properties.Desired.Contains("ImageUpdateDue") || !TimeSpan.TryParse(deviceTwin.Properties.Desired["ImageUpdateDue"].Value.ToString(), out imageUpdateDue))
+				{
+					this.logging.LogMessage("DeviceTwin.Properties ImageUpdateDue setting missing or invalid format", LoggingLevel.Warning);
+					return;
+				}
+				configurationInformation.AddTimeSpan("ImageUpdateDue", imageUpdateDue);
+
+				if (!deviceTwin.Properties.Desired.Contains("ImageUpdatePeriod") || !TimeSpan.TryParse(deviceTwin.Properties.Desired["ImageUpdatePeriod"].Value.ToString(), out imageUpdatePeriod))
+				{
+					this.logging.LogMessage("DeviceTwin.Properties ImageUpdatePeriod setting missing or invalid format", LoggingLevel.Warning);
+					return;
+				}
+				configurationInformation.AddTimeSpan("ImageUpdatePeriod", imageUpdatePeriod);
+
+				this.logging.LogEvent("Configuration", configurationInformation);
+			}
+			catch (Exception ex)
+			{
+				this.logging.LogMessage("Azure IoT Hub client GetTwinAsync failed " + ex.Message, LoggingLevel.Error);
 				return;
 			}
 			#endregion
@@ -181,19 +215,31 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerAzureIoTHubStorage
 			}
 			#endregion
 
-			#region Wire up command handler for taking a camera image on request
+			#region Wire up command handler for image capture request
 			try
 			{
-				azureIoTHubClient.SetMethodHandlerAsync("ImageUpdate", ImageUpdateHandler, null);
+				azureIoTHubClient.SetMethodHandlerAsync("ImageCapture", ImageUpdateHandler, null);
 			}
 			catch (Exception ex)
 			{
-				this.logging.LogMessage("Azure IoT Hub client SetMethodHandlerAsync failed " + ex.Message, LoggingLevel.Error);
+				this.logging.LogMessage("Azure IoT Hub client ImageCapture SetMethodHandlerAsync failed " + ex.Message, LoggingLevel.Error);
 				return;
 			}
 			#endregion
 
-			ImageUpdatetimer = new Timer(ImageUpdateTimerCallback, null, new TimeSpan(0, 0, imageUpdateDueSeconds), new TimeSpan(0, 0, imageUpdatePeriodSeconds));
+			#region Wire up command handler for device reboot request
+			try
+			{
+				azureIoTHubClient.SetMethodHandlerAsync("DeviceReboot", DeviceRebootAsync, null);
+			}
+			catch (Exception ex)
+			{
+				this.logging.LogMessage("Azure IoT Hub client DeviceReboot SetMethodHandlerAsync failed " + ex.Message, LoggingLevel.Error);
+				return;
+			}
+			#endregion
+
+			imageUpdatetimer = new Timer(ImageUpdateTimerCallback, null, imageUpdateDue, imageUpdatePeriod);
 
 			this.logging.LogEvent("Application startup completed");
 
@@ -280,6 +326,21 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerAzureIoTHubStorage
 			{
 				cameraBusy = false;
 			}
+		}
+
+		private async Task<MethodResponse> DeviceRebootAsync(MethodRequest methodRequest, object userContext)
+		{
+			this.logging.LogEvent("Reboot initiated");
+
+			// Stop the image capture timer before reboot
+			if (imageUpdatetimer != null)
+			{
+				imageUpdatetimer.Change(Timeout.Infinite, Timeout.Infinite);
+			}
+
+			ShutdownManager.BeginShutdown(ShutdownKind.Restart, DeviceRebootDelayPeriod);
+
+			return new MethodResponse(200);
 		}
 	}
 }
