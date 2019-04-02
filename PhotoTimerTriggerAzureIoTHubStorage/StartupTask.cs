@@ -79,7 +79,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerAzureIoTHubStorage
 			PackageVersion version = packageId.Version;
 			startupInformation.AddString("ApplicationVersion", string.Format($"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}"));
 
-			this.logging.LogEvent("Application starting", startupInformation);
+			this.logging.LogEvent("Application startup", startupInformation);
 
 			#region Configuration file settings load and creation if not present
 			try
@@ -103,11 +103,11 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerAzureIoTHubStorage
 				transportType = (TransportType)Enum.Parse( typeof(TransportType), configuration.GetSection("TransportType").Value);
 				connnectionInformation.AddString("TransportType", transportType.ToString());
 
-				this.logging.LogEvent("Connection", connnectionInformation);
+				this.logging.LogEvent("Connection settings", connnectionInformation);
 			}
 			catch (Exception ex)
 			{
-				this.logging.LogMessage("JSON configuration file load or AzureIoT HUb connection settings missing/invalid" + ex.Message, LoggingLevel.Error);
+				this.logging.LogMessage("JSON configuration file load or AzureIoT Hub connection settings missing/invalid" + ex.Message, LoggingLevel.Error);
 				return;
 			}
 			#endregion
@@ -193,11 +193,11 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerAzureIoTHubStorage
 				}
 				configurationInformation.AddTimeSpan("ImageUpdatePeriod", imageUpdatePeriod);
 
-				this.logging.LogEvent("Configuration", configurationInformation);
+				this.logging.LogEvent("Configuration settings", configurationInformation);
 			}
 			catch (Exception ex)
 			{
-				this.logging.LogMessage("Azure IoT Hub client GetTwinAsync failed " + ex.Message, LoggingLevel.Error);
+				this.logging.LogMessage("Azure IoT Hub client GetTwinAsync failed or property missing/invalid" + ex.Message, LoggingLevel.Error);
 				return;
 			}
 			#endregion
