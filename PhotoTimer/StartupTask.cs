@@ -1,6 +1,6 @@
 ﻿/*
     Copyright ® 2019 Feb devMobile Software, All Rights Reserved
- 
+
     MIT License
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -34,13 +34,13 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimer
 
 	public sealed class StartupTask : IBackgroundTask
 	{
-		private readonly LoggingChannel logging = new LoggingChannel("devMobile Timer Photo demo", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
-		private BackgroundTaskDeferral backgroundTaskDeferral = null;
-		private Timer ImageUpdatetimer;
-		private readonly TimeSpan ImageUpdateDueDefault = new TimeSpan(0, 0, 15);
-		private readonly TimeSpan ImageUpdatePeriodDefault = new TimeSpan(0, 5, 0);
-		private MediaCapture mediaCapture;
 		private const string ImageFilenameFormat = "Image{0:yyMMddhhmmss}.jpg";
+		private readonly LoggingChannel logging = new LoggingChannel("devMobile Timer Photo demo", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
+		private readonly TimeSpan imageUpdateDueDefault = new TimeSpan(0, 0, 15);
+		private readonly TimeSpan imageUpdatePeriodDefault = new TimeSpan(0, 5, 0);
+		private MediaCapture mediaCapture;
+		private Timer imageUpdatetimer;
+		private BackgroundTaskDeferral backgroundTaskDeferral = null;
 
 		public void Run(IBackgroundTaskInstance taskInstance)
 		{
@@ -50,11 +50,10 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimer
 
 			try
 			{
-				mediaCapture = new MediaCapture();
-				mediaCapture.InitializeAsync().AsTask().Wait();
+				this.mediaCapture = new MediaCapture();
+				this.mediaCapture.InitializeAsync().AsTask().Wait();
 
-				ImageUpdatetimer = new Timer(ImageUpdateTimerCallback, null, ImageUpdateDueDefault, ImageUpdatePeriodDefault);
-
+				this.imageUpdatetimer = new Timer(this.ImageUpdateTimerCallback, null, this.imageUpdateDueDefault, this.imageUpdatePeriodDefault);
 			}
 			catch (Exception ex)
 			{
@@ -62,14 +61,14 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimer
 				return;
 			}
 
-			startupInformation.AddString("PrimaryUse", mediaCapture.VideoDeviceController.PrimaryUse.ToString());
-			startupInformation.AddTimeSpan("Due", ImageUpdateDueDefault);
-			startupInformation.AddTimeSpan("Period", ImageUpdatePeriodDefault);
+			startupInformation.AddString("PrimaryUse", this.mediaCapture.VideoDeviceController.PrimaryUse.ToString());
+			startupInformation.AddTimeSpan("Due", this.imageUpdateDueDefault);
+			startupInformation.AddTimeSpan("Period", this.imageUpdatePeriodDefault);
 
 			this.logging.LogEvent("Application started", startupInformation);
 
-			//enable task to continue running in background
-			backgroundTaskDeferral = taskInstance.GetDeferral();
+			// enable task to continue running in background
+			this.backgroundTaskDeferral = taskInstance.GetDeferral();
 		}
 
 		private void ImageUpdateTimerCallback(object state)
@@ -82,7 +81,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimer
 
 				IStorageFile photoFile = KnownFolders.PicturesLibrary.CreateFileAsync(filename, CreationCollisionOption.ReplaceExisting).AsTask().Result;
 				ImageEncodingProperties imageProperties = ImageEncodingProperties.CreateJpeg();
-				mediaCapture.CapturePhotoToStorageFileAsync(imageProperties, photoFile).AsTask().Wait();
+				this.mediaCapture.CapturePhotoToStorageFileAsync(imageProperties, photoFile).AsTask().Wait();
 
 				LoggingFields imageInformation = new LoggingFields();
 				imageInformation.AddDateTime("TakenAtUTC", currentTime);
