@@ -1,34 +1,32 @@
-﻿/*
-    Copyright ® 2019 March devMobile Software, All Rights Reserved
- 
-    MIT License
+﻿// <copyright file="StartupTask.cs" company="devMobile Software">
+// Copyright ® 2019 Feb devMobile Software, All Rights Reserved
+//
+//  MIT License
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE"
+//
+// </copyright>
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE
-
-*/
 namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerLocalStorage
 {
 	using System;
-	using System.IO;
 	using System.Diagnostics;
-	using System.Linq;
-	using System.Net.NetworkInformation;
+	using System.IO;
 
 	using Microsoft.Extensions.Configuration;
 
@@ -43,23 +41,18 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerLocalStorage
 
 	public sealed class StartupTask : IBackgroundTask
 	{
-		private BackgroundTaskDeferral backgroundTaskDeferral = null;
-		private readonly LoggingChannel logging = new LoggingChannel("devMobile Photo Digital Input Local Storage", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
 		private const string ConfigurationFilename = "appsettings.json";
+		private readonly LoggingChannel logging = new LoggingChannel("devMobile Photo Digital Input Local Storage", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
 		private GpioPin interruptGpioPin = null;
 		private GpioPinEdge interruptTriggerOn = GpioPinEdge.RisingEdge;
 		private int interruptPinNumber;
 		private TimeSpan debounceTimeout;
 		private DateTime imageLastCapturedAtUtc = DateTime.MinValue;
 		private MediaCapture mediaCapture;
-		private string deviceMacAddress;
-		/*
-		private string localStorageContainerFoldernameLatestFormat;
 		private string localStorageimageFilenameLatestFormat;
-		private string localStorageContainerNameHistoryFormat;
 		private string localStorageImageFilenameHistoryFormat;
-		*/
 		private volatile bool cameraBusy = false;
+		private BackgroundTaskDeferral backgroundTaskDeferral = null;
 
 		public void Run(IBackgroundTaskInstance taskInstance)
 		{
@@ -73,21 +66,11 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerLocalStorage
 			startupInformation.AddString("OSVersion", Environment.OSVersion.VersionString);
 			startupInformation.AddString("MachineName", Environment.MachineName);
 
-			// This is from the application manifest 
+			// This is from the application manifest
 			Package package = Package.Current;
 			PackageId packageId = package.Id;
 			PackageVersion version = packageId.Version;
 			startupInformation.AddString("ApplicationVersion", string.Format($"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}"));
-
-			// ethernet mac address
-			deviceMacAddress = NetworkInterface.GetAllNetworkInterfaces()
-				 .Where(i => i.NetworkInterfaceType.ToString().ToLower().Contains("ethernet"))
-				 .FirstOrDefault()
-				 ?.GetPhysicalAddress().ToString();
-
-			// remove unsupported charachers from MacAddress
-			deviceMacAddress = deviceMacAddress.Replace("-", "").Replace(" ", "").Replace(":", "");
-			startupInformation.AddString("MacAddress", deviceMacAddress);
 
 			try
 			{
@@ -103,28 +86,20 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerLocalStorage
 
 				IConfiguration configuration = new ConfigurationBuilder().AddJsonFile(Path.Combine(localFolder.Path, ConfigurationFilename), false, true).Build();
 
-				/*
-				localStorageContainerFoldernameLatestFormat = configuration.GetSection("AzureContainerNameFormatLatest").Value;
-				startupInformation.AddString("ContainerNameLatestFormat", localStorageContainerFoldernameLatestFormat);
+				this.localStorageimageFilenameLatestFormat = configuration.GetSection("LocalImageFilenameFormatLatest").Value;
+				startupInformation.AddString("ImageFilenameLatestFormat", this.localStorageimageFilenameLatestFormat);
 
-				localStorageimageFilenameLatestFormat = configuration.GetSection("AzureImageFilenameFormatLatest").Value;
-				startupInformation.AddString("ImageFilenameLatestFormat", localStorageimageFilenameLatestFormat);
+				this.localStorageImageFilenameHistoryFormat = configuration.GetSection("LocalImageFilenameFormatHistoric").Value;
+				startupInformation.AddString("ImageFilenameLatestFormat", this.localStorageImageFilenameHistoryFormat);
 
-				localStorageContainerNameHistoryFormat = configuration.GetSection("AzureContainerNameFormatHistory").Value;
-				startupInformation.AddString("ContainerNameHistoryFormat", localStorageContainerNameHistoryFormat);
+				this.interruptPinNumber = int.Parse(configuration.GetSection("InterruptPinNumber").Value);
+				startupInformation.AddInt32("Interrupt pin", this.interruptPinNumber);
 
-				localStorageImageFilenameHistoryFormat = configuration.GetSection("AzureImageFilenameFormatHistory").Value;
-				startupInformation.AddString("ImageFilenameHistoryFormat", localStorageImageFilenameHistoryFormat);
-				*/
+				this.interruptTriggerOn = (GpioPinEdge)Enum.Parse(typeof(GpioPinEdge), configuration.GetSection("interruptTriggerOn").Value);
+				startupInformation.AddString("Interrupt Trigger on", this.interruptTriggerOn.ToString());
 
-				interruptPinNumber = int.Parse(configuration.GetSection("InterruptPinNumber").Value);
-				startupInformation.AddInt32("Interrupt pin", interruptPinNumber);
-
-				interruptTriggerOn = (GpioPinEdge)Enum.Parse(typeof(GpioPinEdge), configuration.GetSection("interruptTriggerOn").Value);
-				startupInformation.AddString("Interrupt Trigger on", interruptTriggerOn.ToString());
-
-				debounceTimeout = TimeSpan.Parse(configuration.GetSection("debounceTimeout").Value);
-				startupInformation.AddTimeSpan("Debounce timeout", debounceTimeout);
+				this.debounceTimeout = TimeSpan.Parse(configuration.GetSection("debounceTimeout").Value);
+				startupInformation.AddTimeSpan("Debounce timeout", this.debounceTimeout);
 			}
 			catch (Exception ex)
 			{
@@ -134,8 +109,8 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerLocalStorage
 
 			try
 			{
-				mediaCapture = new MediaCapture();
-				mediaCapture.InitializeAsync().AsTask().Wait();
+				this.mediaCapture = new MediaCapture();
+				this.mediaCapture.InitializeAsync().AsTask().Wait();
 			}
 			catch (Exception ex)
 			{
@@ -146,9 +121,9 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerLocalStorage
 			try
 			{
 				GpioController gpioController = GpioController.GetDefault();
-				interruptGpioPin = gpioController.OpenPin(interruptPinNumber);
-				interruptGpioPin.SetDriveMode(GpioPinDriveMode.InputPullUp);
-				interruptGpioPin.ValueChanged += InterruptGpioPin_ValueChanged;
+				this.interruptGpioPin = gpioController.OpenPin(this.interruptPinNumber);
+				this.interruptGpioPin.SetDriveMode(GpioPinDriveMode.InputPullUp);
+				this.interruptGpioPin.ValueChanged += this.InterruptGpioPin_ValueChanged;
 			}
 			catch (Exception ex)
 			{
@@ -158,8 +133,8 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerLocalStorage
 
 			this.logging.LogEvent("Application started", startupInformation);
 
-			//enable task to continue running in background
-			backgroundTaskDeferral = taskInstance.GetDeferral();
+			// enable task to continue running in background
+			this.backgroundTaskDeferral = taskInstance.GetDeferral();
 		}
 
 		private async void InterruptGpioPin_ValueChanged(GpioPin sender, GpioPinValueChangedEventArgs args)
@@ -167,73 +142,48 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerLocalStorage
 			DateTime currentTime = DateTime.UtcNow;
 			Debug.WriteLine($"{DateTime.UtcNow.ToLongTimeString()} Digital Input Interrupt {sender.PinNumber} triggered {args.Edge}");
 
-			if (args.Edge == interruptTriggerOn)
+			if (args.Edge == this.interruptTriggerOn)
 			{
 				return;
 			}
 
 			// Check that enough time has passed for picture to be taken
-			if ((currentTime - imageLastCapturedAtUtc) < debounceTimeout)
+			if ((currentTime - this.imageLastCapturedAtUtc) < this.debounceTimeout)
 			{
 				return;
 			}
-			imageLastCapturedAtUtc = currentTime;
+
+			this.imageLastCapturedAtUtc = currentTime;
 
 			// Just incase - stop code being called while photo already in progress
-			if (cameraBusy)
+			if (this.cameraBusy)
 			{
 				return;
 			}
-			cameraBusy = true;
+
+			this.cameraBusy = true;
 
 			try
 			{
-				/*
-				StorageFile photoFile = await KnownFolders.PicturesLibrary.CreateFileAsync(ImageFilenameLocal, CreationCollisionOption.ReplaceExisting);
-				ImageEncodingProperties imageProperties = ImageEncodingProperties.CreateJpeg();
-				await mediaCapture.CapturePhotoToStorageFileAsync(imageProperties, photoFile);
+				string localFilenameLatest = string.Format(this.localStorageimageFilenameLatestFormat, Environment.MachineName.ToLower(), currentTime);
+				string localFilenameHistory = string.Format(this.localStorageImageFilenameHistoryFormat, Environment.MachineName.ToLower(), currentTime);
 
-				string azureContainernameLatest = string.Format(localStorageContainerFoldernameLatestFormat, Environment.MachineName, deviceMacAddress, currentTime).ToLower();
-				string azureFilenameLatest = string.Format(localStorageimageFilenameLatestFormat, Environment.MachineName, deviceMacAddress, currentTime);
-				string azureContainerNameHistory = string.Format(localStorageContainerNameHistoryFormat, Environment.MachineName, deviceMacAddress, currentTime).ToLower();
-				string azureFilenameHistory = string.Format(localStorageImageFilenameHistoryFormat, Environment.MachineName.ToLower(), deviceMacAddress, currentTime);
+				StorageFile photoFile = await KnownFolders.PicturesLibrary.CreateFileAsync(localFilenameLatest, CreationCollisionOption.ReplaceExisting);
+				ImageEncodingProperties imageProperties = ImageEncodingProperties.CreateJpeg();
+				await this.mediaCapture.CapturePhotoToStorageFileAsync(imageProperties, photoFile);
 
 				LoggingFields imageInformation = new LoggingFields();
 				imageInformation.AddDateTime("TakenAtUTC", currentTime);
 				imageInformation.AddString("LocalFilename", photoFile.Path);
-				imageInformation.AddString("AzureContainerNameLatest", azureContainernameLatest);
-				imageInformation.AddString("AzureFilenameLatest", azureFilenameLatest);
-				imageInformation.AddString("AzureContainerNameHistory", azureContainerNameHistory);
-				imageInformation.AddString("AzureFilenameHistory", azureFilenameHistory);
+				imageInformation.AddString("LocalFilenameHistory", localFilenameHistory);
 				this.logging.LogEvent("Saving image(s) to local storage", imageInformation);
 
-				CloudStorageAccount storageAccount = CloudStorageAccount.Parse(azureStorageConnectionString);
-				CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-
-				// Update the latest image in storage
-				if (!string.IsNullOrWhiteSpace(azureContainernameLatest) && !string.IsNullOrWhiteSpace(azureFilenameLatest))
+				// copy the historic image to storage
+				if (!string.IsNullOrWhiteSpace(localFilenameHistory))
 				{
-					CloudBlobContainer containerLatest = blobClient.GetContainerReference(azureContainernameLatest);
-					await containerLatest.CreateIfNotExistsAsync();
-
-					CloudBlockBlob blockBlobLatest = containerLatest.GetBlockBlobReference(azureFilenameLatest);
-					await blockBlobLatest.UploadFromFileAsync(photoFile);
-
-					this.logging.LogEvent("Image latest saved to Azure storage");
+					await photoFile.CopyAsync(KnownFolders.PicturesLibrary, localFilenameHistory);
+					this.logging.LogEvent("Image history saved to local storage");
 				}
-
-				// Upload the historic image to storage
-				if (!string.IsNullOrWhiteSpace(azureContainerNameHistory) && !string.IsNullOrWhiteSpace(azureFilenameHistory))
-				{
-					CloudBlobContainer containerHistory = blobClient.GetContainerReference(azureContainerNameHistory);
-					await containerHistory.CreateIfNotExistsAsync();
-
-					CloudBlockBlob blockBlob = containerHistory.GetBlockBlobReference(azureFilenameHistory);
-					await blockBlob.UploadFromFileAsync(photoFile);
-
-					this.logging.LogEvent("Image historic saved to Azure storage");
-				}
-			*/
 			}
 			catch (Exception ex)
 			{
@@ -241,7 +191,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoDigitalInputTriggerLocalStorage
 			}
 			finally
 			{
-				cameraBusy = false;
+				this.cameraBusy = false;
 			}
 		}
 	}
