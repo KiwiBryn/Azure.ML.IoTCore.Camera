@@ -1,6 +1,6 @@
 /*
     Copyright ® 2019 March devMobile Software, All Rights Reserved
- 
+
     MIT License
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,17 +24,18 @@
 */
 namespace devMobile.Azure.Storage
 {
-	using System.IO;
 	using System.Configuration;
+	using System.IO;
 	using System.Threading.Tasks;
 	using Microsoft.Azure.WebJobs;
 	using Microsoft.Azure.WebJobs.Host;
+
 	using SendGrid.Helpers.Mail;
 
 	public static class ImageEmailer
 	{
 		[FunctionName("ImageEmailer")]
-		public async static Task Run(
+		public static async Task Run(
 				[BlobTrigger("current/{name}")]
 				Stream inputBlob,
 				string name,
@@ -48,7 +49,7 @@ namespace devMobile.Azure.Storage
 			message.AddTo(new EmailAddress(ConfigurationManager.AppSettings["EmailAddressTo"]));
 			message.From = new EmailAddress(ConfigurationManager.AppSettings["EmailAddressFrom"]);
 			message.SetSubject("RPI Web camera Image attached");
-			message.AddContent("text/plain", $"{name} {inputBlob.Length} bytes" );
+			message.AddContent("text/plain", $"{name} {inputBlob.Length} bytes");
 
 			await message.AddAttachmentAsync(name, inputBlob, "image/jpeg");
 
