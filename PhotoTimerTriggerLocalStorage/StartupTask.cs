@@ -170,7 +170,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerLocalStorage
 			}
 			catch (Exception ex)
 			{
-				this.logging.LogMessage("Camera photo or image save failed " + ex.Message, LoggingLevel.Error);
+				this.logging.LogMessage("Image capture or save failed " + ex.Message, LoggingLevel.Error);
 			}
 			finally
 			{

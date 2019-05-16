@@ -1,27 +1,27 @@
-﻿/*
-    Copyright ® 2019 March devMobile Software, All Rights Reserved
+﻿// <copyright file="StartupTask.cs" company="devMobile Software">
+// Copyright ® 2019 Feb devMobile Software, All Rights Reserved
+//
+//  MIT License
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE"
+//
+// </copyright>
 
-    MIT License
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE
-
-*/
 namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerAzureIoTHubStorage
 {
 	using System;
@@ -46,21 +46,21 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerAzureIoTHubStorage
 
 	public sealed class StartupTask : IBackgroundTask
 	{
-		private readonly LoggingChannel logging = new LoggingChannel("devMobile Photo Timer Azure IoT Hub Storage", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
 		private const string ConfigurationFilename = "appsettings.json";
+#if DEBUG
+		private const string ImageFilenameLocal = "latest.jpg";
+#endif
+		private readonly LoggingChannel logging = new LoggingChannel("devMobile Photo Timer Azure IoT Hub Storage", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
+		private readonly TimeSpan deviceRebootDelayPeriod = new TimeSpan(0, 0, 25);
 		private string azureIoTHubConnectionString;
 		private TransportType transportType;
 		private DeviceClient azureIoTHubClient = null;
 		private MediaCapture mediaCapture;
-#if DEBUG
-		private const string ImageFilenameLocal = "latest.jpg";
-#endif
+		private volatile bool cameraBusy = false;
 		private string azureStorageimageFilenameLatestFormat;
 		private string azureStorageImageFilenameHistoryFormat;
 		private Timer imageUpdatetimer;
 		private BackgroundTaskDeferral backgroundTaskDeferral = null;
-		private volatile bool cameraBusy = false;
-		private readonly TimeSpan deviceRebootDelayPeriod = new TimeSpan(0, 0, 25);
 
 		public void Run(IBackgroundTaskInstance taskInstance)
 		{
@@ -329,6 +329,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerAzureIoTHubStorage
 			}
 		}
 
+#pragma warning disable 1998
 		private async Task<MethodResponse> DeviceRebootAsync(MethodRequest methodRequest, object userContext)
 		{
 			this.logging.LogEvent("Reboot initiated");
@@ -343,5 +344,6 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerAzureIoTHubStorage
 
 			return new MethodResponse(200);
 		}
+#pragma warning restore 1998
 	}
 }
