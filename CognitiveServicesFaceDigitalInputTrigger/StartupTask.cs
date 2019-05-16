@@ -22,7 +22,7 @@
 //
 // </copyright>
 
-namespace devMobile.Windows10IotCore.IoT.CustomVisionServiceDigitalInputTrigger
+namespace devMobile.Windows10IotCore.IoT.CognitiveServicesFaceDigitalInputTrigger
 {
 	using System;
 	using System.Collections.Generic;
