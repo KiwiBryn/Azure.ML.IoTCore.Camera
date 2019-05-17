@@ -46,6 +46,7 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesFaceDigitalInputTrigge
 	public sealed class StartupTask : IBackgroundTask
 	{
 		private const string ConfigurationFilename = "appsettings.json";
+		private const string ImageFilename = "latest.jpg";
 		private readonly LoggingChannel logging = new LoggingChannel("devMobile Photo Digital Input Trigger Custom Vision", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
 		private readonly TimeSpan timerPeriodInfinite = new TimeSpan(0, 0, 0);
 		private readonly TimeSpan timerPeriodDetectIlluminated = new TimeSpan(0, 0, 0, 0, 10);
@@ -206,6 +207,10 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesFaceDigitalInputTrigge
 					this.mediaCapture.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), captureStream).AsTask().Wait();
 					captureStream.FlushAsync().AsTask().Wait();
 					captureStream.Seek(0);
+
+					IStorageFile photoFile = await KnownFolders.PicturesLibrary.CreateFileAsync(ImageFilename, CreationCollisionOption.ReplaceExisting);
+					ImageEncodingProperties imageProperties = ImageEncodingProperties.CreateJpeg();
+					await this.mediaCapture.CapturePhotoToStorageFileAsync(imageProperties, photoFile);
 
 					IList<DetectedFace> detectedFaces = await this.faceClient.Face.DetectWithStreamAsync(captureStream.AsStreamForRead());
 
