@@ -30,7 +30,7 @@ namespace devMobile.Windows10IotCore.IoT.DigitalInputTrigger
 
 	public sealed class StartupTask : IBackgroundTask
 	{
-		private const int InterruptPinNumber = 115; // G2 on DB410C
+		private const int InterruptPinNumber = 24;
 		private GpioPin interruptGpioPin = null;
 		private BackgroundTaskDeferral backgroundTaskDeferral = null;
 
