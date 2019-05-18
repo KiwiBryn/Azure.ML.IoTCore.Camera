@@ -175,7 +175,7 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesFace
 			DateTime currentTime = DateTime.UtcNow;
 			Debug.WriteLine($"Digital Input Interrupt {sender.PinNumber} triggered {args.Edge}");
 
-			if (args.Edge == this.interruptTriggerOn)
+			if (args.Edge != this.interruptTriggerOn)
 			{
 				return;
 			}
