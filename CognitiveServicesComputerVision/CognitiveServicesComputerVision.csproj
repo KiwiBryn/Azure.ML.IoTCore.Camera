@@ -7,7 +7,7 @@
     <ProjectGuid>{DD7BBD87-D648-46D6-91A3-FD5B85A507B5}</ProjectGuid>
     <OutputType>winmdobj</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CognitiveServicesComputerVision</RootNamespace>
+    <RootNamespace>devMobile.Windows10IotCore.IoT.CognitiveServicesComputerVision</RootNamespace>
     <AssemblyName>CognitiveServicesComputerVision</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
@@ -26,7 +26,7 @@
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\ARM\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
-    <NoWarn>;2008</NoWarn>
+    <NoWarn>;2008;SA0001;SA1027;SA1600;SA1636</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>ARM</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
@@ -102,6 +102,9 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <Content Include="AppSettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="CognitiveServicesComputerVision_TemporaryKey.pfx" />
     <AdditionalFiles Include="stylecop.json" />
   </ItemGroup>
