@@ -60,11 +60,12 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVision
 		private Timer displayOffTimer;
 		private TimeSpan debounceTimeout;
 		private CustomVisionPredictionClient customVisionClient;
-		//private List<Category> categoryList = new List<Category>();
 		private DateTime imageLastCapturedAtUtc = DateTime.MinValue;
 		private MediaCapture mediaCapture;
 		private string azureCognitiveServicesEndpoint;
 		private string azureCognitiveServicesSubscriptionKey;
+		private Guid projectId;
+		private string publishedName;
 		private volatile bool cameraBusy = false;
 		private BackgroundTaskDeferral backgroundTaskDeferral = null;
 
@@ -103,12 +104,11 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVision
 				this.azureCognitiveServicesSubscriptionKey = configuration.GetSection("AzureCognitiveServicesSubscriptionKey").Value;
 				startupInformation.AddString("AzureCognitiveServicesSubscriptionKey", this.azureCognitiveServicesSubscriptionKey);
 
-				/*
-				foreach (string categoryName in configuration.GetSection("ComputerVisionCategoryNames").Value.Split(','))
-				{
-					this.categoryList.Add(new Category(name: categoryName));
-				}
-				*/
+				this.projectId = Guid.Parse(configuration.GetSection("ProjectID").Value);
+				startupInformation.AddGuid("ProjectID", this.projectId);
+
+				this.publishedName = configuration.GetSection("PublishedName").Value;
+				startupInformation.AddString("PublishedName", this.publishedName);
 
 				this.interruptPinNumber = int.Parse(configuration.GetSection("InterruptPinNumber").Value);
 				startupInformation.AddInt32("Interrupt pin", this.interruptPinNumber);
@@ -219,24 +219,23 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVision
 					IStorageFile photoFile = await KnownFolders.PicturesLibrary.CreateFileAsync(ImageFilename, CreationCollisionOption.ReplaceExisting);
 					ImageEncodingProperties imageProperties = ImageEncodingProperties.CreateJpeg();
 					await this.mediaCapture.CapturePhotoToStorageFileAsync(imageProperties, photoFile);
-					/*
-					ImageAnalysis imageAnalysis = await this.computerVisionClient.AnalyzeImageInStreamAsync(captureStream.AsStreamForRead());
 
-					Debug.WriteLine($"Tag count {imageAnalysis.Categories.Count}");
+					ImagePrediction imagePrediction = await this.customVisionClient.ClassifyImageAsync(this.projectId, this.publishedName, captureStream.AsStreamForRead());
 
-					if (imageAnalysis.Categories.Intersect(this.categoryList, new CategoryComparer()).Any())
-					{
-						this.displayGpioPin.Write(GpioPinValue.High);
+					Debug.WriteLine($"Prediction count {imagePrediction.Predictions.Count}");
 
-						// Start the timer to turn the LED off
-						this.displayOffTimer.Change(this.timerPeriodFaceIlluminated, this.timerPeriodInfinite);
-					}
-					*/
 					LoggingFields imageInformation = new LoggingFields();
 
 					imageInformation.AddDateTime("TakenAtUTC", currentTime);
 					imageInformation.AddInt32("Pin", sender.PinNumber);
-					// imageInformation.AddInt32("Tags", imageAnalysis.Categories.Count);
+					imageInformation.AddInt32("Predictions", imagePrediction.Predictions.Count);
+
+					foreach (var prediction in imagePrediction.Predictions)
+					{
+						Debug.WriteLine($" Tag:{prediction.TagName} {prediction.Probability}");
+						imageInformation.AddDouble($"Tag:{prediction.TagName}", prediction.Probability);
+					}
+
 					this.logging.LogEvent("Captured image processed by Cognitive Services", imageInformation);
 				}
 			}
@@ -254,25 +253,5 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVision
 		{
 			this.displayGpioPin.Write(GpioPinValue.Low);
 		}
-
-		/*
-		internal class CategoryComparer : IEqualityComparer<Category>
-		{
-			public bool Equals(Category x, Category y)
-			{
-				if (string.Equals(x.Name, y.Name, StringComparison.OrdinalIgnoreCase))
-				{
-					return true;
-				}
-
-				return false;
-			}
-
-			public int GetHashCode(Category obj)
-			{
-				return obj.Name.GetHashCode();
-			}
-		}
-		*/
 	}
 }
