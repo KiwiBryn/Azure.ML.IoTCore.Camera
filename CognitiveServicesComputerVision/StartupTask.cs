@@ -235,7 +235,14 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesComputerVision
 
 					imageInformation.AddDateTime("TakenAtUTC", currentTime);
 					imageInformation.AddInt32("Pin", sender.PinNumber);
-					imageInformation.AddInt32("Tags", imageAnalysis.Categories.Count);
+					Debug.WriteLine($"Categories:{imageAnalysis.Categories.Count}");
+					imageInformation.AddInt32("Categories", imageAnalysis.Categories.Count);
+					foreach (Category category in imageAnalysis.Categories)
+					{
+						Debug.WriteLine($" Category:{category.Name} {category.Score}");
+						imageInformation.AddDouble($" Category:{category.Name}", category.Score);
+					}
+
 					this.logging.LogEvent("Captured image processed by Cognitive Services", imageInformation);
 				}
 			}
