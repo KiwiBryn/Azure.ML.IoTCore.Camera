@@ -212,7 +212,12 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesFace
 					ImageEncodingProperties imageProperties = ImageEncodingProperties.CreateJpeg();
 					await this.mediaCapture.CapturePhotoToStorageFileAsync(imageProperties, photoFile);
 
-					IList<DetectedFace> detectedFaces = await this.faceClient.Face.DetectWithStreamAsync(captureStream.AsStreamForRead());
+					IList<FaceAttributeType> returnfaceAttributes = new List<FaceAttributeType>();
+
+					returnfaceAttributes.Add(FaceAttributeType.Gender);
+					returnfaceAttributes.Add(FaceAttributeType.Age);
+
+					IList<DetectedFace> detectedFaces = await this.faceClient.Face.DetectWithStreamAsync(captureStream.AsStreamForRead(), returnFaceAttributes: returnfaceAttributes);
 
 					Debug.WriteLine($"Count {detectedFaces.Count}");
 
