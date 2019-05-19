@@ -1,47 +1,27 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<Package
-  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
-  xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
-  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
-  xmlns:iot="http://schemas.microsoft.com/appx/manifest/iot/windows10"
-  IgnorableNamespaces="uap mp iot">
-
-  <Identity
-    Name="CognitiveServicesCustomVision-uwp"
-    Publisher="CN=Bryn.Lewis"
-    Version="1.0.0.0" />
-
-  <mp:PhoneIdentity PhoneProductId="e7371c5b-8bab-4777-bcd9-83f18ec72ece" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:iot="http://schemas.microsoft.com/appx/manifest/iot/windows10" IgnorableNamespaces="uap mp iot">
+  <Identity Name="CognitiveServicesCustomVision-uwp" Publisher="CN=Bryn.Lewis" Version="1.0.0.0" />
+  <mp:PhoneIdentity PhoneProductId="e7371c5b-8bab-4777-bcd9-83f18ec72ece" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>CognitiveServicesCustomVision</DisplayName>
+    <DisplayName>devMobile Cognitive Services Custom Vision API Sample</DisplayName>
     <PublisherDisplayName>Bryn.Lewis</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
-
   <Dependencies>
     <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
   </Dependencies>
-
   <Resources>
-    <Resource Language="x-generate"/>
+    <Resource Language="x-generate" />
   </Resources>
-
   <Applications>
     <Application Id="App">
-      <uap:VisualElements
-        DisplayName="CognitiveServicesCustomVision"
-        Square150x150Logo="Assets\Square150x150Logo.png"
-        Square44x44Logo="Assets\Square44x44Logo.png"
-        Description="CognitiveServicesCustomVision"
-        BackgroundColor="transparent"
-        AppListEntry="none">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
+      <uap:VisualElements DisplayName="devMobile Cognitive Services Custom Vision Sample" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="Windows 10 IoT Core application which shows how to use a digital input as a trigger for taking a photo then uploading it to Azure Cognitive Services Custom Vision API" BackgroundColor="transparent" AppListEntry="none">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png">
+        </uap:DefaultTile>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
       <Extensions>
-        <Extension Category="windows.backgroundTasks" EntryPoint="CognitiveServicesCustomVision.StartupTask">
+        <Extension Category="windows.backgroundTasks" EntryPoint="devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVision.StartupTask">
           <BackgroundTasks>
             <iot:Task Type="startup" />
           </BackgroundTasks>
@@ -49,8 +29,10 @@
       </Extensions>
     </Application>
   </Applications>
-
   <Capabilities>
     <Capability Name="internetClient" />
+    <uap:Capability Name="picturesLibrary" />
+    <DeviceCapability Name="webcam" />
+    <DeviceCapability Name="microphone" />
   </Capabilities>
 </Package>
