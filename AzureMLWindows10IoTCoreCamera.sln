@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CognitiveServicesCustomVisi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CognitiveServicesFace", "CognitiveServicesFace\CognitiveServicesFace.csproj", "{5AABE215-F0E7-4FAE-9D7A-7E80FC33BECD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CognitiveServicesCustomVisionAzureIoTHub", "CognitiveServicesCustomVisionAzureIoTHub\CognitiveServicesCustomVisionAzureIoTHub.csproj", "{853CD17A-6A71-42D3-8452-BEA497338A37}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -275,6 +277,26 @@ Global
 		{5AABE215-F0E7-4FAE-9D7A-7E80FC33BECD}.Release|x86.ActiveCfg = Release|x86
 		{5AABE215-F0E7-4FAE-9D7A-7E80FC33BECD}.Release|x86.Build.0 = Release|x86
 		{5AABE215-F0E7-4FAE-9D7A-7E80FC33BECD}.Release|x86.Deploy.0 = Release|x86
+		{853CD17A-6A71-42D3-8452-BEA497338A37}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{853CD17A-6A71-42D3-8452-BEA497338A37}.Debug|ARM.ActiveCfg = Debug|ARM
+		{853CD17A-6A71-42D3-8452-BEA497338A37}.Debug|ARM.Build.0 = Debug|ARM
+		{853CD17A-6A71-42D3-8452-BEA497338A37}.Debug|ARM.Deploy.0 = Debug|ARM
+		{853CD17A-6A71-42D3-8452-BEA497338A37}.Debug|x64.ActiveCfg = Debug|x64
+		{853CD17A-6A71-42D3-8452-BEA497338A37}.Debug|x64.Build.0 = Debug|x64
+		{853CD17A-6A71-42D3-8452-BEA497338A37}.Debug|x64.Deploy.0 = Debug|x64
+		{853CD17A-6A71-42D3-8452-BEA497338A37}.Debug|x86.ActiveCfg = Debug|x86
+		{853CD17A-6A71-42D3-8452-BEA497338A37}.Debug|x86.Build.0 = Debug|x86
+		{853CD17A-6A71-42D3-8452-BEA497338A37}.Debug|x86.Deploy.0 = Debug|x86
+		{853CD17A-6A71-42D3-8452-BEA497338A37}.Release|Any CPU.ActiveCfg = Release|x86
+		{853CD17A-6A71-42D3-8452-BEA497338A37}.Release|ARM.ActiveCfg = Release|ARM
+		{853CD17A-6A71-42D3-8452-BEA497338A37}.Release|ARM.Build.0 = Release|ARM
+		{853CD17A-6A71-42D3-8452-BEA497338A37}.Release|ARM.Deploy.0 = Release|ARM
+		{853CD17A-6A71-42D3-8452-BEA497338A37}.Release|x64.ActiveCfg = Release|x64
+		{853CD17A-6A71-42D3-8452-BEA497338A37}.Release|x64.Build.0 = Release|x64
+		{853CD17A-6A71-42D3-8452-BEA497338A37}.Release|x64.Deploy.0 = Release|x64
+		{853CD17A-6A71-42D3-8452-BEA497338A37}.Release|x86.ActiveCfg = Release|x86
+		{853CD17A-6A71-42D3-8452-BEA497338A37}.Release|x86.Build.0 = Release|x86
+		{853CD17A-6A71-42D3-8452-BEA497338A37}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
