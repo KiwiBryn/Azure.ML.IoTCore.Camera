@@ -229,6 +229,36 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesFace
 					imageInformation.AddDateTime("TakenAtUTC", currentTime);
 					imageInformation.AddInt32("Pin", sender.PinNumber);
 					imageInformation.AddInt32("Faces", detectedFaces.Count);
+					foreach (DetectedFace detectedFace in detectedFaces)
+					{
+						Debug.WriteLine("Face");
+						if (detectedFace.FaceId.HasValue)
+						{
+							imageInformation.AddGuid("FaceId", detectedFace.FaceId.Value);
+							Debug.WriteLine($" Id:{detectedFace.FaceId.Value}");
+						}
+
+						imageInformation.AddInt32("Left", detectedFace.FaceRectangle.Left);
+						imageInformation.AddInt32("Width", detectedFace.FaceRectangle.Width);
+						imageInformation.AddInt32("Top", detectedFace.FaceRectangle.Top);
+						imageInformation.AddInt32("Height", detectedFace.FaceRectangle.Height);
+						Debug.WriteLine($" L:{detectedFace.FaceRectangle.Left} W:{detectedFace.FaceRectangle.Width} T:{detectedFace.FaceRectangle.Top} H:{detectedFace.FaceRectangle.Height}");
+						if (detectedFace.FaceAttributes != null)
+						{
+							if (detectedFace.FaceAttributes.Gender.HasValue)
+							{
+								imageInformation.AddString("Gender", detectedFace.FaceAttributes.Gender.Value.ToString());
+								Debug.WriteLine($" Gender:{detectedFace.FaceAttributes.Gender.ToString()}");
+							}
+
+							if (detectedFace.FaceAttributes.Age.HasValue)
+							{
+								imageInformation.AddDouble("Age", detectedFace.FaceAttributes.Age.Value);
+								Debug.WriteLine($" Age:{detectedFace.FaceAttributes.Age.Value.ToString("F1")}");
+							}
+						}
+					}
+
 					this.logging.LogEvent("Captured image processed by Cognitive Services", imageInformation);
 				}
 			}
