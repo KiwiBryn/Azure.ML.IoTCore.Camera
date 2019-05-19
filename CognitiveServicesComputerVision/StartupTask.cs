@@ -240,7 +240,7 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesComputerVision
 					foreach (Category category in imageAnalysis.Categories)
 					{
 						Debug.WriteLine($" Category:{category.Name} {category.Score}");
-						imageInformation.AddDouble($" Category:{category.Name}", category.Score);
+						imageInformation.AddDouble($"Category:{category.Name}", category.Score);
 					}
 
 					this.logging.LogEvent("Captured image processed by Cognitive Services", imageInformation);
