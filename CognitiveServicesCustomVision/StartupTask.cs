@@ -3,7 +3,7 @@
 //
 //  MIT License
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy
+// Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -47,8 +47,8 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVision
 	public sealed class StartupTask : IBackgroundTask
 	{
 		private const string ConfigurationFilename = "appsettings.json";
-		private const string ImageFilename = "ComputerVisionAPILatest.jpg";
-		private readonly LoggingChannel logging = new LoggingChannel("devMobile Cognitive Services Computer Vision API", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
+		private const string ImageFilename = "CustomVisionAPILatest.jpg";
+		private readonly LoggingChannel logging = new LoggingChannel("devMobile Cognitive Services Custom Vision API", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
 		private readonly TimeSpan timerPeriodInfinite = new TimeSpan(0, 0, 0);
 		private readonly TimeSpan timerPeriodDetectIlluminated = new TimeSpan(0, 0, 0, 0, 10);
 		private readonly TimeSpan timerPeriodFaceIlluminated = new TimeSpan(0, 0, 0, 5);
@@ -138,7 +138,7 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVision
 			}
 			catch (Exception ex)
 			{
-				this.logging.LogMessage("Azure Cognitive Services Face Client configuration failed " + ex.Message, LoggingLevel.Error);
+				this.logging.LogMessage("Azure Cognitive Services Custom Vision Client configuration failed " + ex.Message, LoggingLevel.Error);
 				return;
 			}
 
