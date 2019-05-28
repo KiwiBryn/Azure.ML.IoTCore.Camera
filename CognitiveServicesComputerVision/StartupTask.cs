@@ -137,7 +137,7 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesComputerVision
 			}
 			catch (Exception ex)
 			{
-				this.logging.LogMessage("Azure Cognitive Services Face Client configuration failed " + ex.Message, LoggingLevel.Error);
+				this.logging.LogMessage("Azure Cognitive Services Computer Vision client configuration failed " + ex.Message, LoggingLevel.Error);
 				return;
 			}
 
