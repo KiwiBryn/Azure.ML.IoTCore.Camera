@@ -51,7 +51,7 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesComputerVision
 		private readonly LoggingChannel logging = new LoggingChannel("devMobile Cognitive Services Computer Vision API", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
 		private readonly TimeSpan timerPeriodInfinite = new TimeSpan(0, 0, 0);
 		private readonly TimeSpan timerPeriodDetectIlluminated = new TimeSpan(0, 0, 0, 0, 10);
-		private readonly TimeSpan timerPeriodFaceIlluminated = new TimeSpan(0, 0, 0, 5);
+		private readonly TimeSpan timerPeriodCategoryFoundIlluminated = new TimeSpan(0, 0, 0, 5);
 		private GpioPin interruptGpioPin = null;
 		private GpioPinEdge interruptTriggerOn = GpioPinEdge.RisingEdge;
 		private int interruptPinNumber;
@@ -228,7 +228,7 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesComputerVision
 						this.displayGpioPin.Write(GpioPinValue.High);
 
 						// Start the timer to turn the LED off
-						this.displayOffTimer.Change(this.timerPeriodFaceIlluminated, this.timerPeriodInfinite);
+						this.displayOffTimer.Change(this.timerPeriodCategoryFoundIlluminated, this.timerPeriodInfinite);
 					}
 
 					LoggingFields imageInformation = new LoggingFields();
