@@ -25,10 +25,8 @@
 namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVision
 {
 	using System;
-	using System.Collections.Generic;
 	using System.Diagnostics;
 	using System.IO;
-	using System.Linq;
 	using System.Threading;
 
 	using Microsoft.Azure.CognitiveServices.Vision.CustomVision.Prediction;
@@ -51,7 +49,7 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVision
 		private readonly LoggingChannel logging = new LoggingChannel("devMobile Cognitive Services Custom Vision API", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
 		private readonly TimeSpan timerPeriodInfinite = new TimeSpan(0, 0, 0);
 		private readonly TimeSpan timerPeriodDetectIlluminated = new TimeSpan(0, 0, 0, 0, 10);
-		private readonly TimeSpan timerPeriodFaceIlluminated = new TimeSpan(0, 0, 0, 5);
+		private readonly TimeSpan timerPeriodTagIlluminated = new TimeSpan(0, 0, 0, 5);
 		private GpioPin interruptGpioPin = null;
 		private GpioPinEdge interruptTriggerOn = GpioPinEdge.RisingEdge;
 		private int interruptPinNumber;
@@ -60,6 +58,8 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVision
 		private Timer displayOffTimer;
 		private TimeSpan debounceTimeout;
 		private CustomVisionPredictionClient customVisionClient;
+		private string triggerTag;
+		private double triggerThreshold;
 		private DateTime imageLastCapturedAtUtc = DateTime.MinValue;
 		private MediaCapture mediaCapture;
 		private string azureCognitiveServicesEndpoint;
@@ -110,6 +110,12 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVision
 				this.publishedName = configuration.GetSection("PublishedName").Value;
 				startupInformation.AddString("PublishedName", this.publishedName);
 
+				this.triggerTag = configuration.GetSection("TriggerTag").Value;
+				startupInformation.AddString("TriggerTag", this.triggerTag);
+
+				this.triggerThreshold = double.Parse(configuration.GetSection("TriggerThreshold").Value);
+				startupInformation.AddDouble("TriggerThreshold", this.triggerThreshold);
+
 				this.interruptPinNumber = int.Parse(configuration.GetSection("InterruptPinNumber").Value);
 				startupInformation.AddInt32("Interrupt pin", this.interruptPinNumber);
 
@@ -159,7 +165,7 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVision
 			{
 				GpioController gpioController = GpioController.GetDefault();
 				this.interruptGpioPin = gpioController.OpenPin(this.interruptPinNumber);
-				this.interruptGpioPin.SetDriveMode(GpioPinDriveMode.InputPullUp);
+				this.interruptGpioPin.SetDriveMode(GpioPinDriveMode.InputPullDown);
 				this.interruptGpioPin.ValueChanged += this.InterruptGpioPin_ValueChanged;
 
 				this.displayGpioPin = gpioController.OpenPin(this.displayPinNumber);
@@ -234,6 +240,14 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVision
 					{
 						Debug.WriteLine($" Tag:{prediction.TagName} {prediction.Probability}");
 						imageInformation.AddDouble($"Tag:{prediction.TagName}", prediction.Probability);
+
+						if ((string.Compare(prediction.TagName, this.triggerTag, true) == 0) && (prediction.Probability > this.triggerThreshold))
+						{
+							this.displayGpioPin.Write(GpioPinValue.High);
+
+							// Start the timer to turn the LED off
+							this.displayOffTimer.Change(this.timerPeriodTagIlluminated, this.timerPeriodInfinite);
+						}
 					}
 
 					this.logging.LogEvent("Captured image processed by Cognitive Services", imageInformation);
