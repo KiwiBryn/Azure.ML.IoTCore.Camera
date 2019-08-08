@@ -25,10 +25,8 @@
 namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVision
 {
 	using System;
-	using System.Collections.Generic;
 	using System.Diagnostics;
 	using System.IO;
-	using System.Linq;
 	using System.Threading;
 
 	using Microsoft.Azure.CognitiveServices.Vision.CustomVision.Prediction;

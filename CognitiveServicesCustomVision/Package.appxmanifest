@@ -34,5 +34,6 @@
     <uap:Capability Name="picturesLibrary" />
     <DeviceCapability Name="webcam" />
     <DeviceCapability Name="microphone" />
+    <DeviceCapability Name="lowLevel" />
   </Capabilities>
 </Package>
