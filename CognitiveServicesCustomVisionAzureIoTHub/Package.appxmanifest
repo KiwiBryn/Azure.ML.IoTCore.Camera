@@ -16,7 +16,7 @@
   <Applications>
     <Application Id="App">
       <uap:VisualElements
-	  DisplayName="CognitiveServicesCustomVisionAzureIoTHub"
+	  DisplayName="devMobile Cognitive Services Azure IoT Hub Sample"
 	  Square150x150Logo="Assets\Square150x150Logo.png"
 	  Square44x44Logo="Assets\Square44x44Logo.png"
 	  Description="CognitiveServicesCustomVisionAzureIoTHub"

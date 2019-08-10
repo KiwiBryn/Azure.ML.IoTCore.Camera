@@ -50,15 +50,15 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVisionAzureIoTHu
 	using Windows.System;
 	using Windows.System.Profile;
 
-	enum ModelType
-	{
-		Undefined = 0,
-		Classification,
-		Detection
-	}
-
 	public sealed class StartupTask : IBackgroundTask
 	{
+		private enum ModelType
+		{
+			Undefined = 0,
+			Classification,
+			Detection
+		}
+
 		private const string ConfigurationFilename = "appsettings.json";
 		private const string ImageFilename = "CustomVisionAPILatest.jpg";
 		private readonly LoggingChannel logging = new LoggingChannel("devMobile Cognitive Services Custom Vision API", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
@@ -373,25 +373,22 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVisionAzureIoTHu
 		{
 			DateTime currentTime = DateTime.UtcNow;
 
+			// Just incase - stop code being called while photo already in progress
+			if (this.cameraBusy)
+			{
+				return;
+			}
+			this.cameraBusy = true;
+			this.displayGpioPin.Write(GpioPinValue.High);
+
 			// Check that enough time has passed for picture to be taken
 			if ((currentTime - this.imageLastCapturedAtUtc) < this.debounceTimeout)
 			{
-				this.displayGpioPin.Write(GpioPinValue.High);
 				this.displayOffTimer.Change(this.timerPeriodDetectIlluminated, this.timerPeriodInfinite);
 				return;
 			}
 
 			this.imageLastCapturedAtUtc = currentTime;
-
-			// Just incase - stop code being called while photo already in progress
-			if (this.cameraBusy)
-			{
-				this.displayGpioPin.Write(GpioPinValue.High);
-				this.displayOffTimer.Change(this.timerPeriodDetectIlluminated, this.timerPeriodInfinite);
-				return;
-			}
-
-			this.cameraBusy = true;
 
 			try
 			{
@@ -407,18 +404,16 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVisionAzureIoTHu
 					ImageEncodingProperties imageProperties = ImageEncodingProperties.CreateJpeg();
 					await this.mediaCapture.CapturePhotoToStorageFileAsync(imageProperties, photoFile);
 
-
 					switch (modelType)
 					{
 						case ModelType.Classification:
 							imagePrediction = await this.customVisionClient.ClassifyImageAsync(this.projectId, this.modelPublishedName, captureStream.AsStreamForRead());
 							break;
 						case ModelType.Detection:
-							imagePrediction = this.customVisionClient.DetectImage(this.projectId, this.modelPublishedName, captureStream.AsStreamForRead());
+							imagePrediction = await this.customVisionClient.DetectImageAsync(this.projectId, this.modelPublishedName, captureStream.AsStreamForRead());
 							break;
 						default:
-							Debug.WriteLine($"Unknown modelType");
-							return;
+							throw new ArgumentException("ModelType Invalid");
 					}
 					Debug.WriteLine($"Prediction count {imagePrediction.Predictions.Count}");
 				}
@@ -428,29 +423,56 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVisionAzureIoTHu
 
 				imageInformation.AddDateTime("TakenAtUTC", currentTime);
 				imageInformation.AddBoolean("IsCommand", isCommand);
+				imageInformation.AddDouble("Probability threshold", probabilityThreshold);
 				imageInformation.AddInt32("Predictions", imagePrediction.Predictions.Count);
 
+				// Display and log the results of the prediction
 				foreach (var prediction in imagePrediction.Predictions)
 				{
 					Debug.WriteLine($" Tag:{prediction.TagName} {prediction.Probability}");
 					imageInformation.AddDouble($"Tag:{prediction.TagName}", prediction.Probability);
 				}
 
-				// Group the tags to get the count
-				var groupedPredictions = from prediction in imagePrediction.Predictions where prediction.Probability > probabilityThreshold 
-						group prediction by new { prediction.TagName }														
-						into newGroup
-						select new
-						{
-							TagName = newGroup.Key.TagName,
-							Count = newGroup.Count(),
-						};
-
-				foreach (var prediction in groupedPredictions)
+				// Post process the predictions based on the type of model
+				switch (modelType)
 				{
-					Debug.WriteLine($" Tag:{prediction.TagName} {prediction.Count}");
-					telemetryDataPoint.Add(prediction.TagName, prediction.Count);
-					imageInformation.AddInt32($"Tag:{prediction.TagName}", prediction.Count);
+					case ModelType.Classification:
+						// Use only the tags above the specified minimum probability
+						foreach (var prediction in imagePrediction.Predictions)
+						{
+							if (prediction.Probability >= probabilityThreshold)
+							{
+								// Display and log the individual tag probabilities
+								Debug.WriteLine($" Tag valid:{prediction.TagName} {prediction.Probability:0.00}");
+								imageInformation.AddDouble($"Tag valid:{prediction.TagName}", prediction.Probability);
+
+								telemetryDataPoint.Add(prediction.TagName, prediction.Probability);
+							}
+						}
+						break;
+
+					case ModelType.Detection:
+						// Group the tags to get the count, include only the predictions above the specified minimum probability
+						var groupedPredictions = from prediction in imagePrediction.Predictions
+														 where prediction.Probability >= probabilityThreshold
+														 group prediction by new { prediction.TagName }
+								into newGroup
+														 select new
+														 {
+															 TagName = newGroup.Key.TagName,
+															 Count = newGroup.Count(),
+														 };
+
+						// Display and log the agregated predictions
+						foreach (var prediction in groupedPredictions)
+						{
+							Debug.WriteLine($" Tag valid:{prediction.TagName} {prediction.Count}");
+							imageInformation.AddInt32($"Tag valid:{prediction.TagName}", prediction.Count);
+							telemetryDataPoint.Add(prediction.TagName, prediction.Count);
+						}
+						break;
+					default:
+						throw new ArgumentException("ModelType Invalid");
 				}
 
 				this.logging.LogEvent("Captured image processed by Cognitive Services", imageInformation);
@@ -463,7 +485,7 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVisionAzureIoTHu
 						await this.azureIoTHubClient.SendEventAsync(message);
 						Debug.WriteLine(" {0:HH:mm:ss} AzureIoTHubClient SendEventAsync finish", DateTime.UtcNow);
 					}
-					this.logging.LogEvent("SendEventAsync CSV payload", imageInformation, LoggingLevel.Information);
+					this.logging.LogEvent("SendEventAsync payload", imageInformation, LoggingLevel.Information);
 				}
 				catch (Exception ex)
 				{
@@ -477,6 +499,7 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVisionAzureIoTHu
 			}
 			finally
 			{
+				this.displayGpioPin.Write(GpioPinValue.Low);
 				this.cameraBusy = false;
 			}
 		}
