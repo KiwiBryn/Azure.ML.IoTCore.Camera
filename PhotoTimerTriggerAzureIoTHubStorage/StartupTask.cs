@@ -162,7 +162,7 @@ namespace devMobile.Windows10IotCore.IoT.PhotoTimerTriggerAzureIoTHubStorage
 			{
 				LoggingFields configurationInformation = new LoggingFields();
 
-				Twin deviceTwin = this.azureIoTHubClient.GetTwinAsync().Result;
+				Twin deviceTwin = this.azureIoTHubClient.GetTwinAsync().GetAwaiter().GetResult();
 
 				if (!deviceTwin.Properties.Desired.Contains("AzureImageFilenameLatestFormat"))
 				{
