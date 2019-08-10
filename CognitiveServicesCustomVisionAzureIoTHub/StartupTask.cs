@@ -28,6 +28,8 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVisionAzureIoTHu
 	using System;
 	using System.Diagnostics;
 	using System.IO;
+	using System.Linq;
+	using System.Text;
 	using System.Threading;
 	using System.Threading.Tasks;
 	using Microsoft.Azure.CognitiveServices.Vision.CustomVision.Prediction;
@@ -35,7 +37,8 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVisionAzureIoTHu
 	using Microsoft.Azure.Devices.Client;
 	using Microsoft.Azure.Devices.Shared;
 	using Microsoft.Extensions.Configuration;
-
+	using Newtonsoft.Json;
+	using Newtonsoft.Json.Linq;
 	using Windows.ApplicationModel;
 	using Windows.ApplicationModel.Background;
 	using Windows.Devices.Gpio;
@@ -80,6 +83,7 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVisionAzureIoTHu
 		private string azureCognitiveServicesSubscriptionKey;
 		private Guid projectId;
 		private string modelPublishedName;
+		private double probabilityThreshold;
 		private volatile bool cameraBusy = false;
 		private Timer imageUpdatetimer;
 		private BackgroundTaskDeferral backgroundTaskDeferral = null;
@@ -222,6 +226,13 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVisionAzureIoTHu
 					return;
 				}
 				configurationInformation.AddGuid("ProjectID", projectId);
+
+				if (!deviceTwin.Properties.Desired.Contains("ProbabilityThreshold") || (!Double.TryParse(deviceTwin.Properties.Desired["ProbabilityThreshold"].value.ToString(), out probabilityThreshold)))
+				{
+					this.logging.LogMessage("DeviceTwin.Properties ProbabilityThreshold setting missing or invalid format", LoggingLevel.Warning);
+					return;
+				}
+				configurationInformation.AddDouble("ProbabilityThreshold", probabilityThreshold);
 
 				if (!deviceTwin.Properties.Desired.Contains("AzureCognitiveServicesEndpoint") || (string.IsNullOrWhiteSpace(deviceTwin.Properties.Desired["AzureCognitiveServicesEndpoint"].value.ToString())))
 				{
@@ -412,6 +423,7 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVisionAzureIoTHu
 					Debug.WriteLine($"Prediction count {imagePrediction.Predictions.Count}");
 				}
 
+				JObject telemetryDataPoint = new JObject();
 				LoggingFields imageInformation = new LoggingFields();
 
 				imageInformation.AddDateTime("TakenAtUTC", currentTime);
@@ -424,7 +436,40 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVisionAzureIoTHu
 					imageInformation.AddDouble($"Tag:{prediction.TagName}", prediction.Probability);
 				}
 
+				// Group the tags to get the count
+				var groupedPredictions = from prediction in imagePrediction.Predictions where prediction.Probability > probabilityThreshold 
+						group prediction by new { prediction.TagName }														
+						into newGroup
+						select new
+						{
+							TagName = newGroup.Key.TagName,
+							Count = newGroup.Count(),
+						};
+
+				foreach (var prediction in groupedPredictions)
+				{
+					Debug.WriteLine($" Tag:{prediction.TagName} {prediction.Count}");
+					telemetryDataPoint.Add(prediction.TagName, prediction.Count);
+					imageInformation.AddInt32($"Tag:{prediction.TagName}", prediction.Count);
+				}
+
 				this.logging.LogEvent("Captured image processed by Cognitive Services", imageInformation);
+
+				try
+				{
+					using (Message message = new Message(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(telemetryDataPoint))))
+					{
+						Debug.WriteLine(" {0:HH:mm:ss} AzureIoTHubClient SendEventAsync start", DateTime.UtcNow);
+						await this.azureIoTHubClient.SendEventAsync(message);
+						Debug.WriteLine(" {0:HH:mm:ss} AzureIoTHubClient SendEventAsync finish", DateTime.UtcNow);
+					}
+					this.logging.LogEvent("SendEventAsync CSV payload", imageInformation, LoggingLevel.Information);
+				}
+				catch (Exception ex)
+				{
+					imageInformation.AddString("Exception", ex.ToString());
+					this.logging.LogEvent("SendEventAsync payload", imageInformation, LoggingLevel.Error);
+				}
 			}
 			catch (Exception ex)
 			{
