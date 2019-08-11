@@ -3,7 +3,7 @@
   <Identity Name="CognitiveServicesCustomVisionAzureIoTHub-uwp" Publisher="CN=Bryn.Lewis" Version="1.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="c49d35ee-6686-4c11-b9cd-67b91ff95eb4" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>CognitiveServicesCustomVisionAzureIoTHub</DisplayName>
+    <DisplayName>devMobile Cognitive Services Azure IoT Hub Client</DisplayName>
     <PublisherDisplayName>Bryn.Lewis</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -11,17 +11,11 @@
     <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
   </Dependencies>
   <Resources>
-    <Resource Language="x-generate"/>
+    <Resource Language="x-generate" />
   </Resources>
   <Applications>
     <Application Id="App">
-      <uap:VisualElements
-	  DisplayName="devMobile Cognitive Services Azure IoT Hub Sample"
-	  Square150x150Logo="Assets\Square150x150Logo.png"
-	  Square44x44Logo="Assets\Square44x44Logo.png"
-	  Description="CognitiveServicesCustomVisionAzureIoTHub"
-	  BackgroundColor="transparent"
-	  AppListEntry="none">
+      <uap:VisualElements DisplayName="devMobile Cognitive Services Azure IoT Hub Client" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="Windows 10 IoT Core application which uses a digital input or timer as a trigger for taking a photo, uploading it to Azure Cognitive Services Custom Vision API for analysis, then sending the predictions to an Azure IoT Hub/Azure IoT Central for display or post processing." BackgroundColor="transparent" AppListEntry="none">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png">
         </uap:DefaultTile>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
@@ -35,7 +29,6 @@
       </Extensions>
     </Application>
   </Applications>
-
   <Capabilities>
     <Capability Name="internetClient" />
     <uap:Capability Name="picturesLibrary" />

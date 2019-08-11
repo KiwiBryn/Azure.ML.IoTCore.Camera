@@ -61,7 +61,7 @@ namespace devMobile.Windows10IotCore.IoT.CognitiveServicesCustomVisionAzureIoTHu
 
 		private const string ConfigurationFilename = "appsettings.json";
 		private const string ImageFilename = "CustomVisionAPILatest.jpg";
-		private readonly LoggingChannel logging = new LoggingChannel("devMobile Cognitive Services Custom Vision API", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
+		private readonly LoggingChannel logging = new LoggingChannel("devMobile Cognitive Services Azure IoT Hub Client", null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
 		private readonly TimeSpan deviceRebootDelayPeriod = new TimeSpan(0, 0, 25);
 		private readonly TimeSpan timerPeriodInfinite = new TimeSpan(0, 0, 0);
 		private readonly TimeSpan timerPeriodDetectIlluminated = new TimeSpan(0, 0, 0, 0, 10);
